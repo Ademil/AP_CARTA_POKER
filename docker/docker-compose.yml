@@ -1,0 +1,167 @@
+version: '3.8'
+
+services:
+  # Banco de Dados PostgreSQL
+  postgres:
+    image: postgres:15-alpine
+    container_name: sst-postgres
+    environment:
+      POSTGRES_DB: ${DB_DATABASE:-sst_database}
+      POSTGRES_USER: ${DB_USERNAME:-sst_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-sst_password}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - sst-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-sst_user}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis para cache e filas
+  redis:
+    image: redis:7-alpine
+    container_name: sst-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - sst-network
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend Node.js
+  backend:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    container_name: sst-backend
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USERNAME: ${DB_USERNAME:-sst_user}
+      DB_PASSWORD: ${DB_PASSWORD:-sst_password}
+      DB_DATABASE: ${DB_DATABASE:-sst_database}
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: ${JWT_SECRET:-sst_super_secret_key}
+    ports:
+      - "3000:3000"
+    volumes:
+      - ../backend:/app
+      - /app/node_modules
+      - uploads:/app/uploads
+      - backups:/app/backups
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - sst-network
+    restart: unless-stopped
+
+  # Frontend React
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    container_name: sst-frontend
+    environment:
+      VITE_API_URL: ${VITE_API_URL:-http://localhost:3000/api}
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+    networks:
+      - sst-network
+    restart: unless-stopped
+
+  # Nginx como reverse proxy
+  nginx:
+    image: nginx:alpine
+    container_name: sst-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./ssl:/etc/nginx/ssl
+    depends_on:
+      - backend
+      - frontend
+    networks:
+      - sst-network
+    restart: unless-stopped
+
+  # Monitoramento com Prometheus e Grafana
+  monitoring:
+    image: prom/prometheus:latest
+    container_name: sst-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    networks:
+      - sst-network
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: sst-grafana
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./grafana/datasources:/etc/grafana/provisioning/datasources
+    networks:
+      - sst-network
+    depends_on:
+      - monitoring
+
+  # Traefik para load balancing (opcional)
+  traefik:
+    image: traefik:v2.10
+    container_name: sst-traefik
+    ports:
+      - "8080:8080"  # Dashboard
+      - "80:80"      # HTTP
+      - "443:443"    # HTTPS
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./traefik.yml:/etc/traefik/traefik.yml
+      - ./ssl:/etc/traefik/ssl
+    networks:
+      - sst-network
+
+volumes:
+  postgres_data:
+  redis_data:
+  uploads:
+  backups:
+  prometheus_data:
+  grafana_data:
+
+networks:
+  sst-network:
+    driver: bridge
