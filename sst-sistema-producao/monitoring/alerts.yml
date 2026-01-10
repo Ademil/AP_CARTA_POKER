@@ -1,0 +1,88 @@
+groups:
+  - name: sst_alerts
+    rules:
+      # Alertas de API
+      - alert: APIDown
+        expr: up{job="sst-backend"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "API do Sistema SST está fora do ar"
+          description: "A API backend não está respondendo há mais de 1 minuto"
+
+      - alert: HighAPIErrorRate
+        expr: rate(http_requests_total{status=~"5.."}[5m]) / rate(http_requests_total[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Alta taxa de erros na API"
+          description: "Mais de 5% das requisições estão retornando erro 5xx"
+
+      # Alertas de Banco de Dados
+      - alert: PostgresDown
+        expr: up{job="postgres"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "PostgreSQL está fora do ar"
+          description: "O banco de dados principal não está respondendo"
+
+      - alert: HighPostgresConnections
+        expr: pg_stat_activity_count > 100
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Alto número de conexões no PostgreSQL"
+          description: "Número de conexões ativas excedeu 100"
+
+      # Alertas de Performance
+      - alert: HighResponseTime
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 2
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Alto tempo de resposta da API"
+          description: "95% das requisições estão levando mais de 2 segundos"
+
+      - alert: HighMemoryUsage
+        expr: (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes > 0.9
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Alto uso de memória"
+          description: "Uso de memória está acima de 90%"
+
+      # Alertas de Negócio
+      - alert: NoNewLaudos
+        expr: increase(laudos_criados_total[24h]) == 0
+        for: 1h
+        labels:
+          severity: warning
+        annotations:
+          summary: "Nenhum laudo novo criado"
+          description: "Nenhum laudo foi criado nas últimas 24 horas"
+
+      - alert: FailedSignatures
+        expr: rate(assinaturas_falhas_total[1h]) > 5
+        for: 30m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Muitas assinaturas falhando"
+          description: "Mais de 5 assinaturas falharam na última hora"
+
+      # Alertas de Segurança
+      - alert: BruteForceAttempt
+        expr: rate(auth_failed_total[5m]) > 10
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Possível tentativa de brute force"
+          description: "Mais de 10 tentativas de login falhas em 5 minutos"
