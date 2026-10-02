@@ -1,0 +1,3344 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#0a1628">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="APAVAN Cards">
+<meta name="description" content="APAVAN CARD GAMES — Canastra e Texas Hold'em. Jogo de cartas offline instalável.">
+<title>APAVAN CARD GAMES — Canastra + Poker</title>
+<link id="manifest-link" rel="manifest">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230a1628'/%3E%3Crect x='14' y='10' width='30' height='42' rx='5' fill='%23f2f6fb' transform='rotate(-10 29 31)'/%3E%3Ctext x='32' y='44' font-size='26' text-anchor='middle' fill='%231e6fd9' font-family='sans-serif'%3E%E2%99%A0%3C/text%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230a1628'/%3E%3Ctext x='32' y='45' font-size='34' text-anchor='middle' fill='%234d9fff' font-family='sans-serif'%3E%F0%9F%83%8F%3C/text%3E%3C/svg%3E">
+
+<style>
+:root{
+  --bg-0:#04080f; --bg-1:#0a1628; --bg-2:#0f2244; --bg-3:#14305c;
+  --blue:#1e6fd9; --blue-l:#4d9fff; --cyan:#22d3ee; --steel:#8ea3bd;
+  --white:#eef4fc; --gold:#d9b45b; --felt-a:#0e4437; --felt-b:#062018;
+  --danger:#e05a4a; --ok:#28c98a; --radius:14px;
+  --shadow-1:0 8px 24px rgba(0,0,0,.55); --shadow-2:0 2px 8px rgba(0,0,0,.4);
+  --safe-b:env(safe-area-inset-bottom, 0px); --safe-t:env(safe-area-inset-top, 0px);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;margin:0;padding:0;}
+body{
+  font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+  background:radial-gradient(120% 90% at 50% 0%,#123059 0%,#0a1628 42%,#04080f 100%);
+  color:var(--white); overflow:hidden; overscroll-behavior:none; -webkit-font-smoothing:antialiased;
+}
+button{font-family:inherit;color:inherit;}
+::-webkit-scrollbar{width:8px;height:8px;}
+::-webkit-scrollbar-thumb{background:rgba(120,160,220,.35);border-radius:8px;}
+::-webkit-scrollbar-track{background:transparent;}
+
+#app{display:flex;flex-direction:column;height:100vh;height:100dvh;}
+
+#topbar{
+  display:flex;align-items:center;gap:10px;
+  padding:calc(6px + var(--safe-t)) 12px 6px;
+  background:linear-gradient(180deg,rgba(9,20,38,.98),rgba(9,20,38,.7));
+  border-bottom:1px solid rgba(90,140,220,.18);
+  backdrop-filter:blur(10px); z-index:40; flex:0 0 auto; min-height:48px;
+}
+#topbar .brand{
+  font-weight:800;letter-spacing:.14em;font-size:13px;
+  background:linear-gradient(90deg,#eaf3ff,#7fb5ff 60%,#d9b45b);
+  -webkit-background-clip:text;background-clip:text;color:transparent; white-space:nowrap;
+}
+#topbar .spacer{flex:1;}
+.tb-btn{
+  background:rgba(30,111,217,.16); border:1px solid rgba(90,150,230,.3);
+  color:var(--white); border-radius:10px; padding:7px 11px; font-size:13px; font-weight:600;
+  cursor:pointer; transition:background .15s,transform .1s; white-space:nowrap;
+}
+.tb-btn:active{transform:scale(.95);}
+.tb-btn:hover{background:rgba(30,111,217,.32);}
+
+main{flex:1 1 auto;position:relative;min-height:0;overflow:hidden;}
+
+.screen{
+  position:absolute;inset:0; display:none; flex-direction:column;
+  overflow-y:auto; overflow-x:hidden; padding:14px 14px calc(14px + var(--safe-b));
+  -webkit-overflow-scrolling:touch;
+}
+.screen.active{display:flex;animation:fadeIn .25s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+
+.menu-hero{text-align:center;padding:26px 10px 8px;flex:0 0 auto;}
+.menu-hero .glyph{font-size:52px;line-height:1;filter:drop-shadow(0 6px 18px rgba(77,159,255,.55));animation:float 4s ease-in-out infinite;}
+@keyframes float{0%,100%{transform:translateY(0) rotate(-3deg);}50%{transform:translateY(-8px) rotate(3deg);}}
+.menu-hero h1{
+  margin:12px 0 2px; font-size:clamp(26px,7vw,40px); letter-spacing:.16em; font-weight:800;
+  background:linear-gradient(100deg,#ffffff,#8fc2ff 45%,#d9b45b);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.menu-hero h1 span{display:block;font-size:.44em;letter-spacing:.42em;color:var(--steel);-webkit-text-fill-color:var(--steel);margin-top:4px;font-weight:600;}
+.menu-hero .tagline{color:var(--steel);font-size:12.5px;letter-spacing:.16em;text-transform:uppercase;margin:8px 0 0;}
+
+.menu-buttons{display:flex;flex-direction:column;gap:12px;max-width:520px;width:100%;margin:20px auto 0;flex:0 0 auto;}
+.btn-game{
+  display:flex;align-items:center;gap:16px; padding:18px 20px; border-radius:18px;
+  border:1px solid rgba(110,170,255,.28);
+  background:linear-gradient(135deg,rgba(23,52,96,.95),rgba(11,25,48,.95));
+  cursor:pointer;text-align:left; box-shadow:var(--shadow-1);
+  transition:transform .16s,border-color .16s,box-shadow .16s; position:relative;overflow:hidden;
+}
+.btn-game::after{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(115deg,transparent 35%,rgba(120,180,255,.14) 50%,transparent 65%);
+  transform:translateX(-120%);transition:transform .6s;
+}
+.btn-game:hover::after{transform:translateX(120%);}
+.btn-game:hover{transform:translateY(-2px);border-color:rgba(120,190,255,.6);box-shadow:0 14px 34px rgba(20,70,150,.5);}
+.btn-game:active{transform:scale(.985);}
+.btn-game .icon{
+  font-size:34px;width:56px;height:56px;flex:0 0 56px; display:grid;place-items:center;border-radius:14px;
+  background:radial-gradient(circle at 30% 25%,rgba(77,159,255,.35),rgba(10,22,40,.9));
+  border:1px solid rgba(110,170,255,.3);
+}
+.btn-game.poker .icon{background:radial-gradient(circle at 30% 25%,rgba(217,180,91,.3),rgba(10,22,40,.9));border-color:rgba(217,180,91,.35);}
+.btn-game .txt b{display:block;font-size:17px;letter-spacing:.08em;}
+.btn-game .txt small{display:block;color:var(--steel);font-size:12px;margin-top:3px;letter-spacing:.05em;}
+
+.menu-footer{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:22px auto 8px;max-width:520px;width:100%;flex:0 0 auto;}
+
+.btn{
+  border-radius:12px; border:1px solid rgba(110,170,255,.3);
+  background:linear-gradient(180deg,rgba(30,72,132,.9),rgba(16,38,74,.9));
+  color:var(--white); padding:11px 16px; font-size:14px; font-weight:600; letter-spacing:.04em;
+  cursor:pointer; transition:transform .12s,background .15s,opacity .15s,border-color .15s;
+  box-shadow:var(--shadow-2); user-select:none;
+}
+.btn:hover:not(:disabled){background:linear-gradient(180deg,rgba(40,95,170,.95),rgba(20,48,92,.95));border-color:rgba(130,190,255,.55);}
+.btn:active:not(:disabled){transform:scale(.96);}
+.btn:disabled{opacity:.34;cursor:not-allowed;filter:grayscale(.5);}
+.btn:focus-visible{outline:2px solid var(--cyan);outline-offset:2px;}
+.btn.primary{background:linear-gradient(180deg,#2e86e8,#1553a8);border-color:rgba(140,200,255,.5);}
+.btn.gold{background:linear-gradient(180deg,#c9a24a,#8a6a1e);border-color:rgba(240,215,140,.5);color:#1a1204;}
+.btn.danger{background:linear-gradient(180deg,#c8483a,#8a2a20);border-color:rgba(255,150,140,.4);}
+.btn.ok{background:linear-gradient(180deg,#28c98a,#167a53);border-color:rgba(150,255,210,.35);color:#032018;}
+.btn.ghost{background:rgba(255,255,255,.05);border-color:rgba(150,190,240,.22);}
+.btn.tiny{padding:7px 11px;font-size:12px;border-radius:10px;}
+.btn-icon{
+  background:rgba(255,255,255,.055); border:1px solid rgba(150,190,240,.2);
+  border-radius:12px; padding:10px 15px; font-size:13px; font-weight:600;
+  cursor:pointer;transition:background .15s,transform .12s;
+}
+.btn-icon:hover{background:rgba(77,159,255,.2);}
+.btn-icon:active{transform:scale(.96);}
+
+.panel{
+  max-width:620px;width:100%;margin:0 auto;
+  background:linear-gradient(160deg,rgba(16,38,74,.85),rgba(8,18,36,.9));
+  border:1px solid rgba(90,150,230,.22); border-radius:18px; padding:18px; box-shadow:var(--shadow-1);
+}
+.panel + .panel{margin-top:14px;}
+.panel h2{
+  margin:0 0 14px;font-size:16px;letter-spacing:.14em;text-transform:uppercase;
+  color:#bcd6f7;font-weight:700; border-bottom:1px solid rgba(90,150,230,.2);padding-bottom:10px;
+}
+.field{margin-bottom:16px;}
+.field label{display:block;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--steel);margin-bottom:8px;font-weight:600;}
+.seg{display:flex;gap:8px;flex-wrap:wrap;}
+.seg button{
+  flex:1 1 auto;min-width:78px; padding:11px 8px;border-radius:11px;
+  border:1px solid rgba(110,170,255,.25); background:rgba(255,255,255,.04);
+  font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;
+}
+.seg button.on{background:linear-gradient(180deg,#2e86e8,#1553a8);border-color:rgba(140,200,255,.65);box-shadow:0 0 0 1px rgba(140,200,255,.35) inset;}
+.seg button:active{transform:scale(.96);}
+input[type=text],input[type=number]{
+  width:100%;padding:11px 13px;border-radius:11px;
+  border:1px solid rgba(110,170,255,.25);
+  background:rgba(4,10,22,.7);color:var(--white);
+  font-size:15px;font-family:inherit;
+}
+input:focus{outline:none;border-color:var(--blue-l);box-shadow:0 0 0 3px rgba(77,159,255,.18);}
+input[type=range]{width:100%;accent-color:var(--blue-l);}
+.switch-row{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid rgba(90,150,230,.12);}
+.switch-row:last-child{border-bottom:none;}
+.switch-row span{font-size:14px;}
+.switch{position:relative;width:52px;height:30px;flex:0 0 52px;}
+.switch input{opacity:0;width:0;height:0;position:absolute;}
+.switch .track{
+  position:absolute;inset:0;border-radius:30px;background:rgba(255,255,255,.12);
+  transition:background .2s;border:1px solid rgba(150,190,240,.2);
+}
+.switch .track::before{
+  content:"";position:absolute;width:22px;height:22px;border-radius:50%;
+  background:#e8f1ff;top:3px;left:3px;transition:transform .2s;box-shadow:0 2px 5px rgba(0,0,0,.4);
+}
+.switch input:checked + .track{background:linear-gradient(90deg,#1e6fd9,#28c98a);}
+.switch input:checked + .track::before{transform:translateX(22px);}
+
+.card{
+  --w:58px;
+  width:var(--w);height:calc(var(--w) * 1.44);
+  border-radius:calc(var(--w) * 0.13);
+  background:linear-gradient(158deg,#ffffff 0%,#eef3fa 55%,#dbe5f2 100%);
+  color:#101823; position:relative;flex:0 0 auto;
+  box-shadow:0 4px 10px rgba(0,0,0,.5),0 1px 0 rgba(255,255,255,.6) inset,0 0 0 1px rgba(0,0,0,.14);
+  font-weight:700; user-select:none;
+  transition:transform .16s cubic-bezier(.2,.9,.3,1.3),box-shadow .16s,filter .16s;
+  display:flex;flex-direction:column;justify-content:space-between;
+  padding:calc(var(--w)*0.07) calc(var(--w)*0.09);
+  overflow:hidden;
+}
+.card.red{color:#c62d24;}
+.card .c-tl{display:flex;flex-direction:column;align-items:center;line-height:.95;font-size:calc(var(--w)*0.3);}
+.card .c-br{display:flex;flex-direction:column;align-items:center;line-height:.95;font-size:calc(var(--w)*0.3);transform:rotate(180deg);}
+.card .c-mid{position:absolute;inset:0;display:grid;place-items:center;font-size:calc(var(--w)*0.52);opacity:.9;pointer-events:none;}
+.card.joker{background:linear-gradient(158deg,#fff9e6,#f4e2b0 60%,#e6cf92);}
+.card.mini{--w:34px;}
+.card.big{--w:70px;}
+.card.selectable{cursor:pointer;touch-action:manipulation;}
+@media (hover:hover){
+  .card.selectable:hover{transform:translateY(-8px);box-shadow:0 12px 22px rgba(0,0,0,.55);z-index:3;}
+}
+.card.sel{transform:translateY(-16px);box-shadow:0 0 0 3px var(--cyan),0 14px 26px rgba(34,211,238,.35);z-index:4;}
+.card.back{
+  background:
+    repeating-linear-gradient(45deg,rgba(255,255,255,.055) 0 6px,transparent 6px 12px),
+    linear-gradient(150deg,#1e4f9c,#0d2a55 60%,#081b3a 100%);
+  background-color:#0e2a55;
+  border:1px solid rgba(120,180,255,.28);
+  box-shadow:0 4px 10px rgba(0,0,0,.5),0 0 0 2px rgba(255,255,255,.05) inset;
+}
+.card.back::after{content:"🂠";position:absolute;inset:0;display:grid;place-items:center;font-size:calc(var(--w)*0.5);color:rgba(140,190,255,.35);}
+.card.placeholder{background:rgba(255,255,255,.05);border:1px dashed rgba(140,190,255,.28);box-shadow:none;}
+.card.placeholder::after{content:"";}
+.card.dragging{opacity:.32;transform:translateY(-18px) scale(1.02);}
+.card.drop-target{
+  box-shadow:0 0 0 3px var(--gold),0 12px 26px rgba(217,180,91,.45) !important;
+  transform:translateY(-14px) scale(1.04);
+  z-index:5;
+}
+.card.drag-ghost{
+  pointer-events:none;
+  box-shadow:0 18px 40px rgba(0,0,0,.65),0 0 0 2px var(--cyan) !important;
+  border-radius:9px;
+  will-change:transform,left,top;
+}
+
+#screen-canastra{padding:0;overflow:hidden;}
+.canastra-wrap{display:flex;flex-direction:column;flex:1;min-height:0;gap:6px;padding:6px 8px calc(8px + var(--safe-b));}
+.opp-row{display:flex;gap:8px;justify-content:center;flex-wrap:nowrap;overflow-x:auto;padding-bottom:2px;flex:0 0 auto;}
+.opp-panel{
+  background:linear-gradient(160deg,rgba(20,45,86,.9),rgba(9,20,40,.9));
+  border:1px solid rgba(90,150,230,.22); border-radius:12px;
+  padding:6px 10px;min-width:112px;flex:0 1 auto;
+  transition:border-color .2s,box-shadow .2s; position:relative;
+}
+.opp-panel.active{border-color:var(--cyan);box-shadow:0 0 0 1px var(--cyan),0 0 18px rgba(34,211,238,.3);}
+.opp-panel.is-human{border-color:rgba(217,180,91,.4);}
+.opp-panel .human-tag{
+  position:absolute;top:-6px;right:6px;
+  font-size:8px;font-weight:800;letter-spacing:.08em;
+  background:linear-gradient(90deg,#d9b45b,#8a6a1e);color:#1a1204;
+  padding:1px 5px;border-radius:6px;
+}
+.opp-name{font-size:11.5px;font-weight:700;letter-spacing:.05em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px;}
+.opp-name .team-tag{font-size:9px;color:var(--steel);font-weight:600;letter-spacing:.08em;}
+.opp-hand{display:flex;gap:1px;margin:4px 0;height:22px;align-items:center;}
+.mini-back{width:11px;height:16px;border-radius:2px;background:linear-gradient(150deg,#1e4f9c,#0a1c3a);border:1px solid rgba(120,180,255,.3);}
+.opp-count{font-size:10px;color:var(--steel);letter-spacing:.04em;}
+
+.center-area{display:flex;gap:8px;flex:1;min-height:0;}
+.piles{display:flex;flex-direction:column;gap:8px;align-items:center;justify-content:center;flex:0 0 auto;padding:6px;}
+.pile{
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  cursor:pointer;border-radius:12px;padding:5px 7px;
+  transition:background .15s,transform .12s; border:1px solid transparent;
+}
+.pile:hover{background:rgba(77,159,255,.12);border-color:rgba(120,180,255,.3);}
+.pile.disabled{opacity:.45;cursor:not-allowed;}
+.pile.disabled:hover{background:transparent;border-color:transparent;}
+.pile-label{font-size:9.5px;letter-spacing:.14em;color:var(--steel);font-weight:700;}
+.pile-count{font-size:11px;font-weight:700;color:#bcd6f7;}
+
+.melds-area{
+  flex:1;min-width:0;overflow-y:auto;overflow-x:hidden;
+  background:
+    radial-gradient(120% 100% at 50% 0%,rgba(20,80,60,.4),transparent 70%),
+    linear-gradient(160deg,var(--felt-a),var(--felt-b));
+  border-radius:16px;
+  border:1px solid rgba(120,220,180,.14);
+  box-shadow:0 0 0 6px rgba(6,26,20,.55),0 14px 30px rgba(0,0,0,.5),0 0 60px rgba(20,120,90,.12) inset;
+  padding:8px; display:flex;flex-direction:column;gap:8px;
+}
+.team-melds{display:flex;flex-direction:column;gap:4px;}
+.team-melds-title{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#9fe8c8;font-weight:700;opacity:.85;}
+.melds-row{display:flex;gap:8px;flex-wrap:wrap;}
+.meld{
+  display:flex;gap:1px;padding:4px 5px;border-radius:10px;
+  background:rgba(0,0,0,.25); border:1px solid rgba(150,255,210,.14);
+  cursor:pointer;position:relative;
+  transition:border-color .15s,box-shadow .15s,transform .12s;
+}
+.meld:hover{border-color:rgba(150,255,210,.5);}
+.meld.sel{border-color:var(--cyan);box-shadow:0 0 0 2px var(--cyan);}
+.meld-badge{
+  position:absolute;top:-8px;left:6px;
+  font-size:8px;letter-spacing:.08em;font-weight:800;
+  background:linear-gradient(90deg,#d9b45b,#8a6a1e);color:#1a1204;
+  padding:1px 5px;border-radius:6px;white-space:nowrap;
+}
+.meld-badge.set{background:linear-gradient(90deg,#4d9fff,#1553a8);color:#eaf3ff;}
+.meld-badge.seq{background:linear-gradient(90deg,#28c98a,#0f6a48);color:#032018;}
+.empty-melds{font-size:11px;color:rgba(160,220,200,.5);font-style:italic;}
+
+.hand-area{
+  flex:0 0 auto;
+  background:linear-gradient(180deg,rgba(10,24,46,.75),rgba(6,14,28,.92));
+  border:1px solid rgba(90,150,230,.2); border-radius:14px; padding:6px 8px;
+}
+.hand-toolbar{display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap;}
+.turn-indicator{font-size:11.5px;font-weight:700;letter-spacing:.05em;color:#9fc4f0;flex:1;min-width:120px;}
+.turn-indicator.mine{color:var(--cyan);text-shadow:0 0 12px rgba(34,211,238,.5);}
+.hand-toolbar .hint{font-size:10px;color:var(--steel);letter-spacing:.04em;font-style:italic;opacity:.75;}
+.hand{display:flex;gap:3px;overflow-x:auto;overflow-y:visible;padding:18px 2px 6px;min-height:90px;align-items:flex-end;scroll-behavior:smooth;}
+.hand:empty::after{content:"Mão vazia";color:var(--steel);font-size:12px;}
+.actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:6px;}
+.actions .btn{flex:1 1 auto;min-width:96px;padding:10px 12px;font-size:13px;}
+
+#screen-poker{padding:0;overflow:hidden;}
+.poker-wrap{display:flex;flex-direction:column;flex:1;min-height:0;padding:6px 8px calc(8px + var(--safe-b));gap:6px;}
+.poker-table{
+  flex:1;min-height:0;position:relative;border-radius:24px;
+  background:
+    radial-gradient(70% 60% at 50% 42%,rgba(30,120,90,.55),transparent 75%),
+    radial-gradient(120% 100% at 50% 0%,#12503e,#062018 75%);
+  border:1px solid rgba(140,255,210,.16);
+  box-shadow:0 0 0 8px rgba(10,32,26,.75),0 0 0 10px rgba(217,180,91,.18),0 18px 40px rgba(0,0,0,.6),0 0 90px rgba(20,120,90,.14) inset;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:8px;padding:10px;overflow:hidden;
+}
+.poker-opps{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;width:100%;}
+.seat{
+  background:linear-gradient(160deg,rgba(14,34,62,.94),rgba(7,16,32,.94));
+  border:1px solid rgba(90,150,230,.25); border-radius:12px;
+  padding:6px 9px;min-width:104px;
+  transition:border-color .2s,box-shadow .2s,opacity .2s; text-align:center;
+}
+.seat.active{border-color:var(--cyan);box-shadow:0 0 0 1px var(--cyan),0 0 20px rgba(34,211,238,.32);}
+.seat.folded{opacity:.4;}
+.seat.out{opacity:.25;}
+.seat.winner{border-color:var(--gold);box-shadow:0 0 0 2px var(--gold),0 0 26px rgba(217,180,91,.5);}
+.seat-name{font-size:11px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.seat-stack{font-size:11px;color:var(--gold);font-weight:700;margin-top:2px;}
+.seat-bet{font-size:10px;color:#9fc4f0;margin-top:1px;min-height:12px;}
+.seat-cards{display:flex;gap:2px;justify-content:center;margin-top:4px;min-height:26px;}
+.seat-cards .card{--w:22px;}
+.seat-hand-name{font-size:9.5px;color:#9fe8c8;margin-top:2px;min-height:11px;letter-spacing:.04em;}
+
+.community-zone{display:flex;flex-direction:column;align-items:center;gap:6px;}
+.pot-display{
+  font-size:13px;font-weight:800;letter-spacing:.1em;color:var(--gold);
+  background:rgba(0,0,0,.45); padding:5px 16px;border-radius:20px;
+  border:1px solid rgba(217,180,91,.35); box-shadow:0 0 20px rgba(217,180,91,.16);
+}
+.community{display:flex;gap:6px;min-height:84px;align-items:center;}
+.stage-label{font-size:10px;letter-spacing:.24em;color:rgba(160,220,200,.75);text-transform:uppercase;font-weight:700;}
+
+.hero-zone{display:flex;align-items:center;justify-content:center;gap:16px;width:100%;flex-wrap:wrap;}
+.hero-cards{display:flex;gap:6px;}
+.hero-cards .card{--w:64px;}
+
+.poker-controls{
+  flex:0 0 auto;
+  background:linear-gradient(180deg,rgba(10,24,46,.8),rgba(6,14,28,.95));
+  border:1px solid rgba(90,150,230,.2); border-radius:14px; padding:8px;
+}
+.ctrl-row{display:flex;gap:7px;flex-wrap:wrap;align-items:center;}
+.ctrl-row .btn{flex:1 1 auto;min-width:84px;}
+.raise-row{display:flex;gap:8px;align-items:center;margin-top:8px;}
+.raise-row input[type=range]{flex:1;}
+.raise-val{font-size:13px;font-weight:800;color:var(--gold);min-width:74px;text-align:right;}
+.poker-status{text-align:center;font-size:12px;color:#9fc4f0;padding:4px 0;letter-spacing:.05em;min-height:18px;}
+
+.modal-back{
+  position:fixed;inset:0;z-index:100; background:rgba(2,6,14,.82);
+  backdrop-filter:blur(7px); display:flex;align-items:center;justify-content:center;
+  padding:18px; animation:fadeIn .2s ease;
+}
+.modal-back.handoff{background:rgba(2,6,14,.96);backdrop-filter:blur(14px);}
+.modal{
+  max-width:480px;width:100%;
+  background:linear-gradient(160deg,rgba(20,46,88,.98),rgba(8,18,36,.99));
+  border:1px solid rgba(110,170,255,.3); border-radius:20px; padding:22px;
+  box-shadow:0 24px 60px rgba(0,0,0,.75); max-height:86vh;overflow-y:auto;
+  animation:pop .25s cubic-bezier(.2,.9,.3,1.3);
+}
+@keyframes pop{from{opacity:0;transform:scale(.92) translateY(12px);}to{opacity:1;transform:none;}}
+.modal h3{margin:0 0 14px;font-size:19px;letter-spacing:.08em;text-align:center;}
+.modal .modal-icon{text-align:center;font-size:44px;margin-bottom:6px;}
+.modal .modal-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:18px;}
+.modal .modal-actions .btn{flex:1 1 auto;}
+
+.score-table{width:100%;border-collapse:collapse;font-size:13px;}
+.score-table th,.score-table td{padding:7px 6px;text-align:right;border-bottom:1px solid rgba(90,150,230,.15);}
+.score-table th:first-child,.score-table td:first-child{text-align:left;}
+.score-table th{color:var(--steel);font-size:11px;letter-spacing:.1em;text-transform:uppercase;}
+.score-table .total{font-weight:800;color:var(--gold);font-size:14px;}
+
+#toast-root{
+  position:fixed;left:50%;bottom:calc(20px + var(--safe-b));
+  transform:translateX(-50%); z-index:200;
+  display:flex;flex-direction:column;gap:8px; pointer-events:none;
+  width:min(92vw,420px);
+}
+.toast{
+  background:linear-gradient(160deg,rgba(24,52,98,.97),rgba(9,20,40,.97));
+  border:1px solid rgba(110,170,255,.35); border-left:3px solid var(--cyan);
+  border-radius:12px;padding:11px 15px; font-size:13px;font-weight:600;
+  box-shadow:0 10px 30px rgba(0,0,0,.6);
+  animation:slideUp .28s ease, fadeOut .3s ease 2.4s forwards;
+}
+.toast.warn{border-left-color:#e8a33a;}
+.toast.err{border-left-color:var(--danger);}
+.toast.gold{border-left-color:var(--gold);}
+@keyframes slideUp{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:none;}}
+@keyframes fadeOut{to{opacity:0;transform:translateY(-6px);}}
+
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;}
+.stat-card{background:rgba(255,255,255,.045);border:1px solid rgba(90,150,230,.18);border-radius:12px;padding:12px;}
+.stat-card .lbl{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--steel);font-weight:600;}
+.stat-card .val{font-size:22px;font-weight:800;margin-top:5px;color:#cfe3ff;}
+.stat-card .val.gold{color:var(--gold);}
+
+.ach-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;}
+.ach{
+  display:flex;gap:11px;align-items:center;
+  background:rgba(255,255,255,.04); border:1px solid rgba(90,150,230,.16);
+  border-radius:12px;padding:11px; opacity:.45;filter:grayscale(1);
+  transition:all .2s;
+}
+.ach.unlocked{opacity:1;filter:none;border-color:rgba(217,180,91,.4);background:linear-gradient(140deg,rgba(217,180,91,.12),rgba(255,255,255,.03));}
+.ach .ico{font-size:25px;flex:0 0 auto;}
+.ach .nm{font-size:12.5px;font-weight:700;}
+.ach .ds{font-size:10.5px;color:var(--steel);margin-top:2px;}
+
+@media (max-width:560px){
+  .card{--w:46px;}
+  .hero-cards .card{--w:58px;}
+  .card.mini{--w:30px;}
+  .community .card{--w:50px;}
+  .seat-cards .card{--w:20px;}
+  .opp-name{max-width:96px;}
+  .actions .btn{min-width:74px;font-size:12px;padding:9px 8px;}
+  .menu-hero{padding-top:14px;}
+  .panel{padding:14px;}
+}
+@media (max-height:640px){
+  .menu-hero{padding:8px 10px 0;}
+  .menu-hero .glyph{font-size:34px;}
+  .menu-hero h1{font-size:22px;}
+  .btn-game{padding:12px 14px;}
+  .btn-game .icon{width:42px;height:42px;flex-basis:42px;font-size:24px;}
+  .community{min-height:66px;}
+  .card{--w:42px;}
+  .hero-cards .card{--w:52px;}
+}
+@media (min-width:900px){
+  .card{--w:66px;}
+  .community .card{--w:72px;}
+  .hero-cards .card{--w:78px;}
+  .card.mini{--w:40px;}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.001s !important;transition-duration:.001s !important;}
+}
+body.reduce-motion *{animation:none !important;transition:none !important;}
+
+.brand-foot{
+  text-align:center;font-size:9.5px;letter-spacing:.22em;
+  color:rgba(140,175,215,.4);text-transform:uppercase;
+  padding:6px 0 2px;flex:0 0 auto;
+}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <header id="topbar">
+    <button class="tb-btn" id="btn-back" hidden aria-label="Voltar">◀ Voltar</button>
+    <div class="brand">APAVAN&nbsp;CARD&nbsp;GAMES</div>
+    <div class="spacer"></div>
+    <button class="tb-btn" id="btn-pause" hidden aria-label="Menu de pausa">⏸</button>
+  </header>
+
+  <main>
+    <section id="screen-menu" class="screen active">
+      <div class="menu-hero">
+        <div class="glyph">🃏</div>
+        <h1>APAVAN<span>CARD GAMES</span></h1>
+        <p class="tagline">Canastra • Texas Hold'em</p>
+      </div>
+      <div class="menu-buttons">
+        <button class="btn-game canastra" data-nav="canastra-setup">
+          <span class="icon">🃏</span>
+          <span class="txt"><b>CANASTRA</b><small>2 ou 4 jogadores · solo ou local · IA</small></span>
+        </button>
+        <button class="btn-game poker" data-nav="poker-setup">
+          <span class="icon">♠</span>
+          <span class="txt"><b>POKER — TEXAS HOLD'EM</b><small>Você contra 3 adversários IA</small></span>
+        </button>
+        <button class="btn ghost" id="btn-resume" hidden>▶ Continuar partida salva</button>
+      </div>
+      <div class="menu-footer">
+        <button class="btn-icon" data-nav="stats" aria-label="Estatísticas">📊 Estatísticas</button>
+        <button class="btn-icon" data-nav="achievements" aria-label="Conquistas">🏆 Conquistas</button>
+        <button class="btn-icon" data-nav="settings" aria-label="Configurações">⚙ Configurações</button>
+      </div>
+      <div class="brand-foot">APAVAN ENGENHARIA E CONSULTORIA</div>
+    </section>
+
+    <!-- SETUP CANASTRA -->
+    <section id="screen-canastra-setup" class="screen">
+      <div class="panel">
+        <h2>Nova partida — Canastra</h2>
+
+        <div class="field">
+          <label>Formato</label>
+          <div class="seg" id="seg-canastra-mode">
+            <button data-v="2" class="on">2 Jogadores</button>
+            <button data-v="4">4 Jogadores (Duplas)</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Adversário</label>
+          <div class="seg" id="seg-canastra-opp">
+            <button data-v="ai" class="on">🤖 IA</button>
+            <button data-v="local">👥 Outro jogador (local)</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Nível da IA</label>
+          <div class="seg" id="seg-canastra-diff">
+            <button data-v="easy">Fácil</button>
+            <button data-v="medium" class="on">Médio</button>
+            <button data-v="hard">Difícil</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Pontuação alvo</label>
+          <div class="seg" id="seg-canastra-target">
+            <button data-v="1500">1.500</button>
+            <button data-v="3000" class="on">3.000</button>
+            <button data-v="5000">5.000</button>
+            <button data-v="custom">Personalizada</button>
+          </div>
+          <input type="number" id="canastra-target-custom" min="500" max="20000" step="100" value="3000" style="margin-top:9px;display:none;">
+        </div>
+
+        <div class="field">
+          <label>Nome do Jogador 1</label>
+          <input type="text" id="canastra-pname" maxlength="14" value="Você">
+        </div>
+
+        <div class="field" id="field-p2name" style="display:none;">
+          <label>Nome do Jogador 2</label>
+          <input type="text" id="canastra-p2name" maxlength="14" value="Amigo">
+        </div>
+
+        <div class="field">
+          <label>Nome da equipe (modo Duplas)</label>
+          <input type="text" id="canastra-tname" maxlength="14" value="Equipe A">
+        </div>
+
+        <div class="field">
+          <div class="switch-row">
+            <span>Mostrar cartas dos oponentes (modo dev)</span>
+            <label class="switch"><input type="checkbox" id="canastra-reveal"><span class="track"></span></label>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn primary" id="btn-start-canastra">▶ Iniciar Partida</button>
+          <button class="btn ghost" data-nav="menu">Cancelar</button>
+        </div>
+      </div>
+      <div class="brand-foot">APAVAN CARD GAMES</div>
+    </section>
+
+    <!-- SETUP POKER -->
+    <section id="screen-poker-setup" class="screen">
+      <div class="panel">
+        <h2>Nova mesa — Texas Hold'em</h2>
+        <div class="field">
+          <label>Nível da IA</label>
+          <div class="seg" id="seg-poker-diff">
+            <button data-v="easy">Fácil</button>
+            <button data-v="medium" class="on">Médio</button>
+            <button data-v="hard">Difícil</button>
+          </div>
+        </div>
+        <div class="field">
+          <label>Banca inicial (fichas por jogador)</label>
+          <div class="seg" id="seg-poker-stack">
+            <button data-v="2000">2.000</button>
+            <button data-v="10000" class="on">10.000</button>
+            <button data-v="25000">25.000</button>
+          </div>
+        </div>
+        <div class="field">
+          <label>Blinds (Small / Big)</label>
+          <div class="seg" id="seg-poker-blinds">
+            <button data-v="25">25 / 50</button>
+            <button data-v="50" class="on">50 / 100</button>
+            <button data-v="200">200 / 400</button>
+          </div>
+        </div>
+        <div class="field"><label>Seu nome</label><input type="text" id="poker-pname" maxlength="14" value="Você"></div>
+        <div class="modal-actions">
+          <button class="btn primary" id="btn-start-poker">▶ Iniciar Partida</button>
+          <button class="btn ghost" data-nav="menu">Cancelar</button>
+        </div>
+      </div>
+      <div class="brand-foot">APAVAN CARD GAMES</div>
+    </section>
+
+    <section id="screen-canastra" class="screen">
+      <div class="canastra-wrap" id="canastra-wrap"></div>
+    </section>
+
+    <section id="screen-poker" class="screen">
+      <div class="poker-wrap">
+        <div class="poker-table" id="poker-table"></div>
+        <div class="poker-status" id="poker-status"></div>
+        <div class="poker-controls" id="poker-controls"></div>
+      </div>
+    </section>
+
+    <section id="screen-stats" class="screen">
+      <div class="panel"><h2>📊 Estatísticas</h2><div id="stats-content"></div></div>
+      <div class="panel"><h2>👤 Perfil</h2><div id="profile-content"></div></div>
+      <div class="brand-foot">APAVAN CARD GAMES</div>
+    </section>
+
+    <section id="screen-achievements" class="screen">
+      <div class="panel"><h2>🏆 Conquistas</h2><div class="ach-list" id="ach-content"></div></div>
+      <div class="brand-foot">APAVAN CARD GAMES</div>
+    </section>
+
+    <section id="screen-settings" class="screen">
+      <div class="panel">
+        <h2>⚙ Configurações</h2>
+        <div class="switch-row"><span>✨ Animações</span><label class="switch"><input type="checkbox" id="set-anim" checked><span class="track"></span></label></div>
+        <div class="switch-row"><span>🔊 Sons</span><label class="switch"><input type="checkbox" id="set-sound" checked><span class="track"></span></label></div>
+        <div class="switch-row"><span>📳 Vibração</span><label class="switch"><input type="checkbox" id="set-vibe" checked><span class="track"></span></label></div>
+        <div class="switch-row"><span>🐢 Reduzir animações (acessibilidade)</span><label class="switch"><input type="checkbox" id="set-reduce"><span class="track"></span></label></div>
+        <div class="switch-row"><span>🐞 Painel de log (DEV)</span><label class="switch"><input type="checkbox" id="set-log"><span class="track"></span></label></div>
+        <div class="modal-actions">
+          <button class="btn primary" id="btn-install" hidden>📲 INSTALAR APAVAN CARD GAMES</button>
+        </div>
+        <div class="modal-actions">
+          <button class="btn danger" id="btn-wipe">🗑 Apagar todos os dados</button>
+        </div>
+      </div>
+      <div class="panel">
+        <h2>🐞 Log do sistema</h2>
+        <div id="dev-log" style="font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;line-height:1.6;max-height:220px;overflow:auto;color:#8fb8e8;"></div>
+      </div>
+      <div class="brand-foot">APAVAN ENGENHARIA E CONSULTORIA</div>
+    </section>
+  </main>
+</div>
+
+<div id="modal-root"></div>
+<div id="toast-root"></div>
+
+<script>
+"use strict";
+/* ============================================================================
+   APAVAN CARD GAMES — V1.3
+   Novidades desta versão:
+     - Modo "2 jogadores locais" (pass-and-play) com tela de passe
+     - Modo "4 jogadores local" (2 humanos parceiros + 2 IA)
+     - Cada jogador vê apenas a própria mão (troca controlada)
+     - Correções anteriores mantidas (lixo livre, sequências, drag-and-drop)
+   ========================================================================== */
+
+/* ====== 1. UTILS ====== */
+const $  = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.prototype.slice.call(r.querySelectorAll(s));
+function makeEl(t, c, h){
+  const e = document.createElement(t);
+  if (c) e.className = c;
+  if (h != null) e.innerHTML = h;
+  return e;
+}
+function rnd(max){
+  if (max <= 0) return 0;
+  if (typeof crypto !== "undefined" && crypto.getRandomValues){
+    const a = new Uint32Array(1);
+    const limit = Math.floor(4294967296 / max) * max;
+    let x, g = 0;
+    do { crypto.getRandomValues(a); x = a[0]; } while (x >= limit && ++g < 100);
+    return x % max;
+  }
+  return Math.floor(Math.random() * max);
+}
+function shuffle(arr){
+  for (let i = arr.length - 1; i > 0; i--){
+    const j = rnd(i + 1);
+    const t = arr[i]; arr[i] = arr[j]; arr[j] = t;
+  }
+  return arr;
+}
+const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+
+/* ====== 2. STORE ====== */
+const Store = {
+  KEY: "apavan_card_games_v1",
+  data: null,
+  defaults(){
+    return {
+      settings: { animations:true, sounds:true, vibration:true, reduceMotion:false, devLog:false },
+      profile:  { name:"Jogador", avatar:"🎴", xp:0, level:1, games:0, wins:0, losses:0 },
+      stats: {
+        canastra: { games:0, wins:0, losses:0, best:0, canastras:0, cleanCanastras:0, batidas:0 },
+        poker:    { hands:0, wins:0, allins:0, bestPot:0, royalFlush:0, showdowns:0 }
+      },
+      achievements: {},
+      save: null
+    };
+  },
+  load(){
+    try{
+      const raw = localStorage.getItem(this.KEY);
+      const def = this.defaults();
+      if (!raw){ this.data = def; return; }
+      const p = JSON.parse(raw);
+      this.data = {
+        settings: Object.assign(def.settings, p.settings || {}),
+        profile:  Object.assign(def.profile,  p.profile  || {}),
+        stats: {
+          canastra: Object.assign(def.stats.canastra, (p.stats && p.stats.canastra) || {}),
+          poker:    Object.assign(def.stats.poker,    (p.stats && p.stats.poker)    || {})
+        },
+        achievements: p.achievements || {},
+        save:         p.save || null
+      };
+    }catch(e){ this.data = this.defaults(); }
+  },
+  save(){ try{ localStorage.setItem(this.KEY, JSON.stringify(this.data)); }catch(e){} },
+  get settings(){ return this.data.settings; },
+  get profile(){ return this.data.profile; },
+  get stats(){ return this.data.stats; },
+  addXP(n){
+    const p = this.profile;
+    p.xp += n;
+    p.level = Math.max(1, Math.floor(p.xp / 100) + 1);
+    this.save();
+  },
+  registerGame(kind, won, extra){
+    const p = this.profile;
+    p.games++;
+    if (won) p.wins++; else p.losses++;
+    const st = this.stats[kind];
+    st.games = (st.games || 0) + 1;
+    if (won) st.wins++; else st.losses++;
+    if (extra) Object.assign(st, extra);
+    this.addXP(won ? 40 : 12);
+    this.save();
+  },
+  setSave(o){ this.data.save = o; this.save(); },
+  clearSave(){ this.data.save = null; this.save(); }
+};
+Store.load();
+
+/* ====== 3. AUDIO ====== */
+const AudioManager = {
+  ctx: null, unlocked: false,
+  init(){
+    if (this.ctx) return;
+    try{
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (AC) this.ctx = new AC();
+    }catch(e){ this.ctx = null; }
+  },
+  resume(){
+    this.init();
+    if (this.ctx && this.ctx.state === "suspended") this.ctx.resume();
+    this.unlocked = true;
+  },
+  tone(freq, dur, type, vol, delay){
+    if (!Store.settings.sounds || !this.unlocked) return;
+    this.init();
+    if (!this.ctx) return;
+    try{
+      const t0 = this.ctx.currentTime + (delay || 0);
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = type || "sine";
+      osc.frequency.setValueAtTime(freq, t0);
+      gain.gain.setValueAtTime(0.0001, t0);
+      gain.gain.exponentialRampToValueAtTime(vol || 0.05, t0 + 0.012);
+      gain.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+      osc.connect(gain); gain.connect(this.ctx.destination);
+      osc.start(t0); osc.stop(t0 + dur + 0.02);
+    }catch(e){}
+  },
+  card(){ this.tone(680, 0.055, "triangle", 0.045); this.tone(420, 0.07, "triangle", 0.03, 0.02); },
+  chip(){ this.tone(1150, 0.05, "square", 0.028); this.tone(860, 0.06, "square", 0.022, 0.03); },
+  shuffle(){ for (let i = 0; i < 7; i++) this.tone(300 + rnd(700), 0.035, "sawtooth", 0.016, i * 0.045); },
+  deal(){ this.tone(520, 0.05, "triangle", 0.04); },
+  win(){ [523,659,784,1047].forEach((f,i)=> this.tone(f, 0.24, "sine", 0.055, i*0.11)); },
+  lose(){ [440,370,294,233].forEach((f,i)=> this.tone(f, 0.26, "sine", 0.045, i*0.12)); },
+  error(){ this.tone(180, 0.16, "sawtooth", 0.05); },
+  achievement(){ [784,988,1319].forEach((f,i)=> this.tone(f, 0.3, "triangle", 0.06, i*0.1)); },
+  canastra(){ [392,523,659,880].forEach((f,i)=> this.tone(f, 0.3, "triangle", 0.06, i*0.09)); },
+  pickup(){ this.tone(880, 0.06, "sine", 0.04); },
+  drop(){ this.tone(560, 0.08, "sine", 0.045); },
+  handoff(){ [523, 659, 784].forEach((f, i) => this.tone(f, 0.22, "sine", 0.05, i * 0.09)); }
+};
+
+function vibrate(pattern){
+  if (!Store.settings.vibration) return;
+  try{ if (navigator.vibrate) navigator.vibrate(pattern); }catch(e){}
+}
+
+/* ====== 4. ACHIEVEMENTS ====== */
+const ACHIEVEMENTS = [
+  { id:"first_win",      icon:"🏆", name:"Primeira Vitória",  desc:"Vença sua primeira partida" },
+  { id:"first_canastra", icon:"🃏", name:"Primeira Canastra", desc:"Forme sua primeira canastra" },
+  { id:"clean_canastra", icon:"🔥", name:"Canastra Limpa",    desc:"Forme uma canastra sem curingas" },
+  { id:"batida",         icon:"⚡", name:"Batida Perfeita",   desc:"Bata uma rodada de Canastra" },
+  { id:"big_pot",        icon:"💰", name:"Grande Pote",       desc:"Ganhe um pote de 5.000+ fichas" },
+  { id:"royal_flush",    icon:"♠",  name:"Royal Flush",       desc:"Consiga um Royal Flush" },
+  { id:"allin_win",      icon:"🎲", name:"All-in Vencedor",   desc:"Ganhe um pote indo de all-in" },
+  { id:"ten_wins",       icon:"🎯", name:"10 Vitórias",       desc:"Vença 10 partidas" },
+  { id:"hundred_games",  icon:"👑", name:"100 Partidas",      desc:"Jogue 100 partidas" }
+];
+
+const Achievements = {
+  has(id){ return !!Store.data.achievements[id]; },
+  unlock(id){
+    if (this.has(id)) return false;
+    const a = ACHIEVEMENTS.find(x => x.id === id);
+    if (!a) return false;
+    Store.data.achievements[id] = Date.now();
+    Store.save();
+    AudioManager.achievement();
+    vibrate([28, 60, 28]);
+    UI.toast(`${a.icon} Conquista: <b>${a.name}</b>`, "gold", 3400);
+    return true;
+  },
+  checkGlobal(){
+    const p = Store.profile;
+    if (p.wins >= 1) this.unlock("first_win");
+    if (p.wins >= 10) this.unlock("ten_wins");
+    if (p.games >= 100) this.unlock("hundred_games");
+  }
+};
+
+/* ====== 5. CARD RENDER ====== */
+function cardHTML(card, extraCls, selected){
+  const cls = ["card"];
+  if (card && (card.suit === "♥" || card.suit === "♦")) cls.push("red");
+  if (card && card.joker) cls.push("joker");
+  if (extraCls) cls.push(extraCls);
+  if (selected) cls.push("sel");
+  const d = card ? ` data-card="${card.id}"` : "";
+  if (!card) return `<div class="${cls.join(" ")} placeholder"${d}></div>`;
+  if (card.joker){
+    return `<div class="${cls.join(" ")}"${d} aria-label="Curinga">
+      <div class="c-tl">🃏</div><div class="c-mid">🃏</div><div class="c-br">🃏</div></div>`;
+  }
+  return `<div class="${cls.join(" ")}"${d} aria-label="${card.rank} de ${card.suit}">
+    <div class="c-tl"><span>${card.rank}</span><span>${card.suit}</span></div>
+    <div class="c-mid">${card.suit}</div>
+    <div class="c-br"><span>${card.rank}</span><span>${card.suit}</span></div></div>`;
+}
+function cardBackHTML(x){ return `<div class="card back ${x || ""}"></div>`; }
+
+/* ====== 6. CANASTRA ENGINE ====== */
+const CARD_POINTS = { A:15, "2":5, "3":5, "4":5, "5":5, "6":5, "7":5,
+                      "8":10, "9":10, "10":10, J:10, Q:10, K:10, JOKER:20 };
+const C_SUITS = ["♠","♥","♦","♣"];
+const C_RANKS = ["A","2","3","4","5","6","7","8","9","10","J","Q","K"];
+const C_ORDER = { "A":1,"2":2,"3":3,"4":4,"5":5,"6":6,"7":7,"8":8,"9":9,"10":10,"J":11,"Q":12,"K":13 };
+
+const Canastra = {
+  state: null,
+  undoStack: [],
+  onChange: null,
+  _meldSeq: 1,
+
+  buildDeck(){
+    const deck = [];
+    let id = 0;
+    for (let d = 0; d < 2; d++)
+      for (const s of C_SUITS)
+        for (const r of C_RANKS)
+          deck.push({ id:"c" + (id++), rank:r, suit:s, joker:false });
+    for (let j = 0; j < 4; j++)
+      deck.push({ id:"j" + (id++), rank:"JOKER", suit:"★", joker:true });
+    return deck;
+  },
+
+  newGame(cfg){
+    /* ---------------------------------------------------------------
+       Determina assentos humanos:
+         - Solo: apenas jogador 0
+         - Local 2p: jogadores 0 e 1
+         - Local 4p: jogadores 0 e 2 (parceiros)
+       --------------------------------------------------------------- */
+    let humanSeats;
+    if (!cfg.localMode) humanSeats = [0];
+    else if (cfg.numPlayers === 2) humanSeats = [0, 1];
+    else humanSeats = [0, 2];
+
+    const isHuman = (i) => humanSeats.includes(i);
+
+    /* Nomes */
+    const p1Name = cfg.playerName || "Jogador 1";
+    const p2Name = cfg.player2Name || "Jogador 2";
+    const aiNamesPool = ["Máquina", "Ana", "Bruno", "Carla"];
+    let aiIdx = 0;
+    const players = [];
+    for (let i = 0; i < cfg.numPlayers; i++){
+      let name;
+      if (isHuman(i)){
+        name = (i === 0) ? p1Name : p2Name;
+      } else {
+        name = aiNamesPool[aiIdx++] || ("IA " + i);
+      }
+      players.push({
+        idx: i,
+        name,
+        isAI: !isHuman(i),
+        team: (cfg.numPlayers === 2) ? i : (i % 2),
+        hand: []
+      });
+    }
+
+    /* Equipes */
+    const teams = cfg.numPlayers === 2
+      ? [
+          { id:0, name: p1Name, melds:[], score:0 },
+          { id:1, name: cfg.localMode ? p2Name : "Oponente", melds:[], score:0 }
+        ]
+      : [
+          { id:0, name: cfg.teamName || "Equipe A", melds:[], score:0 },
+          { id:1, name: "Equipe B",                 melds:[], score:0 }
+        ];
+
+    this.state = {
+      config: Object.assign({}, cfg, { humanSeats }),
+      teams, players,
+      stock: [], discard: [], turn: 0, dealer: 0,
+      phase: "draw",
+      mustMeldRank: null,
+      tookDiscard: new Array(cfg.numPlayers).fill(false),
+      round: 1,
+      roundHistory: [],
+      target: cfg.targetScore,
+      revealAll: !!cfg.reveal && !cfg.localMode,
+      lastRoundSummary: null,
+      log: [],
+      /* --- Pass-and-play --- */
+      viewerIdx: 0,             // qual mão está sendo exibida
+      handoffPending: false,    // true = mostra modal de "passe o aparelho"
+      lastHumanViewer: null     // quem viu a mão por último
+    };
+    this._meldSeq = 1;
+    this.undoStack = [];
+    this.log("Nova partida de Canastra iniciada." + (cfg.localMode ? " Modo local." : ""));
+    this.startRound();
+  },
+
+  log(msg){
+    const s = this.state;
+    if (!s) return;
+    s.log.push("[GAME] " + msg);
+    if (s.log.length > 300) s.log.shift();
+    UI.devLog("[GAME] " + msg);
+  },
+
+  startRound(){
+    const s = this.state;
+    const n = s.players.length;
+    const handSize = n === 2 ? 11 : 9;
+    const lixoSize = n === 2 ? 11 : 9;
+
+    s.stock = shuffle(this.buildDeck());
+    s.discard = [];
+    s.teams.forEach(t => { t.melds = []; });
+    s.players.forEach(p => { p.hand = []; });
+    s.tookDiscard = new Array(n).fill(false);
+    s.mustMeldRank = null;
+
+    for (let k = 0; k < handSize; k++)
+      for (let i = 0; i < n; i++)
+        s.players[(i + s.dealer) % n].hand.push(s.stock.pop());
+
+    for (let k = 0; k < lixoSize; k++) s.discard.push(s.stock.pop());
+
+    s.turn = s.dealer % n;
+    s.phase = "draw";
+    this.undoStack = [];
+
+    /* Reset pass-and-play */
+    s.handoffPending = false;
+    s.lastHumanViewer = null;
+    s.viewerIdx = s.turn;
+
+    AudioManager.shuffle();
+    this.log(`Rodada ${s.round} — distribuição concluída.`);
+    this.emit();
+  },
+
+  emit(){ if (this.onChange) this.onChange(); },
+
+  snapshot(){
+    this.undoStack.push(JSON.stringify({
+      teams: this.state.teams,
+      players: this.state.players,
+      stock: this.state.stock,
+      discard: this.state.discard,
+      turn: this.state.turn,
+      phase: this.state.phase,
+      mustMeldRank: this.state.mustMeldRank,
+      tookDiscard: this.state.tookDiscard,
+      viewerIdx: this.state.viewerIdx,
+      handoffPending: this.state.handoffPending
+    }));
+    if (this.undoStack.length > 24) this.undoStack.shift();
+  },
+
+  canUndo(){ return this.undoStack.length > 0 && this.state && this.state.phase !== "roundEnd"; },
+  undo(){
+    if (!this.canUndo()) return false;
+    const snap = JSON.parse(this.undoStack.pop());
+    Object.assign(this.state, snap);
+    this.log("Jogada desfeita.");
+    this.emit();
+    return true;
+  },
+  clearUndo(){ this.undoStack = []; },
+
+  currentPlayer(){ return this.state.players[this.state.turn]; },
+
+  teamHasCanastra(teamId){
+    return this.state.teams[teamId].melds.some(m => m.cards.length >= 7);
+  },
+
+  /* ---- PEGAR LIXO — sempre livre (respeitando a formação mínima) ---- */
+  canTakeDiscard(idx){ return this.whyCantTakeDiscard(idx) === null; },
+
+  whyCantTakeDiscard(idx){
+    const s = this.state;
+    if (!s || s.phase !== "draw" || s.turn !== idx) return "Não é sua vez de comprar.";
+    if (!s.discard.length) return "O lixo está vazio.";
+    const top = s.discard[s.discard.length - 1];
+    if (top.joker) return "Não se pode pegar um lixo com curinga no topo.";
+
+    const hand = s.players[idx].hand;
+    const naturals = hand.filter(c => !c.joker && c.rank === top.rank).length;
+    const jokers   = hand.filter(c => c.joker).length;
+
+    if (naturals >= 2) return null;
+    if (naturals >= 1 && (naturals + jokers) >= 2) return null;
+
+    return `Você precisa de 2 cartas naturais de ${top.rank} (ou 1 natural + 1 curinga) para pegar o lixo.`;
+  },
+
+  drawStock(idx){
+    const s = this.state;
+    if (s.phase !== "draw" || s.turn !== idx) return { ok:false, msg:"Não é sua vez de comprar." };
+    if (s.stock.length === 0){
+      this.endRound(null, "Monte esgotado");
+      return { ok:true };
+    }
+    const p = s.players[idx];
+    const n = Math.min(1, s.stock.length);
+    for (let i = 0; i < n; i++) p.hand.push(s.stock.pop());
+    AudioManager.deal();
+    s.phase = "act";
+    this.log(`${p.name} comprou ${n} carta(s) do monte.`);
+    this.emit();
+    return { ok:true };
+  },
+
+  takeDiscard(idx){
+    const s = this.state;
+    if (!this.canTakeDiscard(idx)) return { ok:false, msg:"Você não pode pegar o lixo agora." };
+    const p = s.players[idx];
+    const top = s.discard[s.discard.length - 1];
+    const rank = top.rank;
+    while (s.discard.length) p.hand.push(s.discard.pop());
+    s.tookDiscard[idx] = true;
+    s.mustMeldRank = rank;
+    s.phase = "act";
+    AudioManager.chip();
+    this.log(`${p.name} pegou o lixo (${rank}).`);
+    this.emit();
+    return { ok:true };
+  },
+
+  validateGroup(cards){
+    if (cards.length < 3) return { ok:false, msg:"Um jogo precisa de no mínimo 3 cartas." };
+
+    const jokers   = cards.filter(c => c.joker);
+    const naturals = cards.filter(c => !c.joker);
+
+    if (naturals.length < 2)
+      return { ok:false, msg:"Um jogo precisa de no mínimo 2 cartas naturais." };
+    if (jokers.length >= naturals.length)
+      return { ok:false, msg:"Curingas não podem ser maioria no jogo." };
+
+    const sameRank = naturals.every(c => c.rank === naturals[0].rank);
+    if (sameRank){
+      return { ok:true, type:"set", rank:naturals[0].rank, suit:null,
+               jokers:jokers.length, naturals:naturals.length };
+    }
+
+    const sameSuit = naturals.every(c => c.suit === naturals[0].suit);
+    if (!sameSuit)
+      return { ok:false, msg:"Cartas devem ter o mesmo valor (set) ou mesmo naipe em sequência." };
+
+    const total = cards.length;
+    const aces   = naturals.filter(c => c.rank === "A").length;
+    const others = naturals.filter(c => c.rank !== "A").map(c => C_ORDER[c.rank]);
+    const aceCombos = [];
+    (function gen(count, cur){
+      if (cur.length === count){ aceCombos.push(cur.slice()); return; }
+      for (const v of [1, 14]){ cur.push(v); gen(count, cur); cur.pop(); }
+    })(aces, []);
+
+    const tryVals = (vals) => {
+      if (new Set(vals).size !== vals.length) return false;
+      const sorted = vals.slice().sort((a, b) => a - b);
+      const min = sorted[0], max = sorted[sorted.length - 1];
+      if (min < 1 || max > 14) return false;
+      if (max - min + 1 > total) return false;
+      let gaps = 0;
+      const set = new Set(vals);
+      for (let v = min; v <= max; v++) if (!set.has(v)) gaps++;
+      if (gaps > jokers.length) return false;
+      const wStartMin = Math.max(1, max - total + 1);
+      const wStartMax = Math.min(min, 14 - total + 1);
+      return wStartMin <= wStartMax;
+    };
+
+    let seqOK = false;
+    for (const av of aceCombos){
+      if (tryVals(others.concat(av))){ seqOK = true; break; }
+    }
+    if (!seqOK)
+      return { ok:false, msg:"Sequência inválida — verifique o naipe e a ordem das cartas." };
+
+    return { ok:true, type:"sequence", rank:null, suit:naturals[0].suit,
+             jokers:jokers.length, naturals:naturals.length };
+  },
+
+  meld(idx, cardIds){
+    const s = this.state;
+    if (s.phase !== "act" || s.turn !== idx) return { ok:false, msg:"Ação inválida agora." };
+    const p = s.players[idx];
+    const cards = p.hand.filter(c => cardIds.includes(c.id));
+    if (cards.length !== cardIds.length) return { ok:false, msg:"Cartas inválidas." };
+
+    const v = this.validateGroup(cards);
+    if (!v.ok) return v;
+
+    const meld = {
+      id: "m" + (this._meldSeq++),
+      team: p.team,
+      type: v.type,
+      rank: v.rank,
+      suit: v.suit,
+      cards: cards.slice()
+    };
+    p.hand = p.hand.filter(c => !cardIds.includes(c.id));
+    s.teams[p.team].melds.push(meld);
+
+    if (s.mustMeldRank && v.type === "set" && v.rank === s.mustMeldRank) s.mustMeldRank = null;
+    if (s.mustMeldRank && v.type === "sequence") s.mustMeldRank = null;
+
+    AudioManager.deal();
+    const label = v.type === "set" ? `jogo de ${v.rank}` : `sequência de ${v.suit}`;
+    this.log(`${p.name} baixou ${label} (${cards.length} cartas).`);
+
+    if (meld.cards.length >= 7){
+      const clean = meld.cards.every(c => !c.joker);
+      AudioManager.canastra();
+      if (p.team === 0){
+        Achievements.unlock("first_canastra");
+        if (clean) Achievements.unlock("clean_canastra");
+      }
+      UI.toast(`${clean ? "🔥 CANASTRA LIMPA" : "🃏 CANASTRA"} de ${label}!`, "gold");
+    }
+    this.emit();
+    return { ok:true };
+  },
+
+  addToMeld(idx, meldId, cardIds){
+    const s = this.state;
+    if (s.phase !== "act" || s.turn !== idx) return { ok:false, msg:"Ação inválida agora." };
+    const p = s.players[idx];
+    const meld = s.teams[p.team].melds.find(m => m.id === meldId);
+    if (!meld) return { ok:false, msg:"Jogo não encontrado na sua equipe." };
+
+    const cards = p.hand.filter(c => cardIds.includes(c.id));
+    if (cards.length !== cardIds.length || cards.length === 0)
+      return { ok:false, msg:"Cartas inválidas." };
+
+    const combined = meld.cards.concat(cards);
+    const v = this.validateGroup(combined);
+    if (!v.ok) return v;
+
+    if (v.type !== meld.type)
+      return { ok:false, msg:"Este jogo não aceita esse tipo de carta." };
+    if (v.type === "set" && v.rank !== meld.rank)
+      return { ok:false, msg:`Só é possível adicionar cartas de ${meld.rank}.` };
+    if (v.type === "sequence" && v.suit !== meld.suit)
+      return { ok:false, msg:"Sequência só aceita cartas do mesmo naipe." };
+
+    const wasCanastra = meld.cards.length >= 7;
+    meld.cards = combined;
+    p.hand = p.hand.filter(c => !cardIds.includes(c.id));
+
+    if (s.mustMeldRank && (v.type === "sequence" || v.rank === s.mustMeldRank))
+      s.mustMeldRank = null;
+
+    AudioManager.deal();
+    const label = v.type === "set" ? `jogo de ${v.rank}` : `sequência de ${v.suit}`;
+    this.log(`${p.name} adicionou ${cards.length} carta(s) à ${label}.`);
+
+    if (!wasCanastra && meld.cards.length >= 7){
+      const clean = meld.cards.every(c => !c.joker);
+      AudioManager.canastra();
+      if (p.team === 0){
+        Achievements.unlock("first_canastra");
+        if (clean) Achievements.unlock("clean_canastra");
+      }
+      UI.toast(`${clean ? "🔥 CANASTRA LIMPA" : "🃏 CANASTRA"} de ${label}!`, "gold");
+    }
+    this.emit();
+    return { ok:true };
+  },
+
+  discard(idx, cardId){
+    const s = this.state;
+    if (s.phase !== "act" || s.turn !== idx) return { ok:false, msg:"Ação inválida agora." };
+    if (s.mustMeldRank) return { ok:false, msg:`Você precisa baixar um jogo de ${s.mustMeldRank} antes de descartar.` };
+
+    const p = s.players[idx];
+    const card = p.hand.find(c => c.id === cardId);
+    if (!card) return { ok:false, msg:"Carta inválida." };
+
+    const isLast = p.hand.length === 1;
+    if (isLast && !this.teamHasCanastra(p.team))
+      return { ok:false, msg:"Você precisa de pelo menos uma canastra para bater." };
+
+    p.hand = p.hand.filter(c => c.id !== cardId);
+    s.discard.push(card);
+    AudioManager.card();
+    this.log(`${p.name} descartou ${card.joker ? "um curinga" : card.rank + card.suit}.`);
+
+    if (isLast){
+      if (p.team === 0) Achievements.unlock("batida");
+      this.endRound(p.team, `${p.name} bateu!`);
+      return { ok:true };
+    }
+
+    this.nextTurn();
+    return { ok:true };
+  },
+
+  nextTurn(){
+    const s = this.state;
+    s.turn = (s.turn + 1) % s.players.length;
+    s.phase = "draw";
+    s.mustMeldRank = null;
+    this.undoStack = [];
+
+    /* ---- Pass-and-play: detecta troca de humano ---- */
+    const newP = s.players[s.turn];
+    if (!newP.isAI){
+      if (s.config.localMode &&
+          s.lastHumanViewer !== null &&
+          s.lastHumanViewer !== s.turn){
+        s.handoffPending = true;
+      }
+      s.viewerIdx = s.turn;
+      s.lastHumanViewer = s.turn;
+    }
+
+    if (s.stock.length === 0){
+      this.endRound(null, "Monte esgotado");
+      return;
+    }
+    this.emit();
+  },
+
+  endRound(battingTeam, reason){
+    const s = this.state;
+    if (s.phase === "roundEnd" || s.phase === "gameOver") return;
+    s.phase = "roundEnd";
+
+    const summary = { round: s.round, reason: reason || "Fim da rodada", teams: [] };
+
+    for (const t of s.teams){
+      let meldPts = 0, bonus = 0, handPts = 0;
+      const canastras = [];
+      for (const m of t.melds){
+        meldPts += m.cards.reduce((a, c) => a + (CARD_POINTS[c.rank] || 0), 0);
+        if (m.cards.length >= 7){
+          const clean = m.cards.every(c => !c.joker);
+          bonus += clean ? 200 : 100;
+          canastras.push({ rank:m.rank, clean, size:m.cards.length });
+          if (t.id === 0){
+            Store.stats.canastra.canastras++;
+            if (clean) Store.stats.canastra.cleanCanastras++;
+          }
+        }
+      }
+      for (const p of s.players)
+        if (p.team === t.id)
+          handPts += p.hand.reduce((a, c) => a + (CARD_POINTS[c.rank] || 0), 0);
+
+      const batida = (battingTeam !== null && t.id === battingTeam) ? 100 : 0;
+      if (batida && t.id === 0) Store.stats.canastra.batidas++;
+
+      const total = meldPts + bonus + batida - handPts;
+      t.score += total;
+
+      summary.teams.push({
+        name: t.name, meldPts, bonus, batida, handPts, total,
+        score: t.score, canastras
+      });
+    }
+
+    Store.save();
+    s.roundHistory.push(summary);
+    s.lastRoundSummary = summary;
+
+    const best = Math.max(s.teams[0].score, s.teams[1].score);
+    if (best >= s.target) Store.stats.canastra.best = Math.max(Store.stats.canastra.best, best);
+
+    this.log(`Rodada ${s.round} encerrada — ${summary.reason}`);
+    this.emit();
+
+    const winner = s.teams.find(t => t.score >= s.target);
+    if (winner){
+      s.phase = "gameOver";
+      s.winner = winner.id;
+      /* Em local 2p, ambos os humanos contam como "vitória" para o perfil do jogador 1 se ele ganhou */
+      const humanTeam = s.players[0].team;
+      const won = winner.id === humanTeam;
+      Store.registerGame("canastra", won);
+      Achievements.checkGlobal();
+      Store.save();
+      setTimeout(() => {
+        if (won){ AudioManager.win(); vibrate([40, 60, 40, 60, 80]); }
+        else AudioManager.lose();
+        UI.showCanastraEnd(winner, won);
+      }, 380);
+    } else {
+      AudioManager.chip();
+      setTimeout(() => UI.showRoundSummary(summary), 380);
+    }
+  },
+
+  nextRound(){
+    const s = this.state;
+    if (s.phase === "gameOver") return;
+    s.round++;
+    s.dealer = (s.dealer + 1) % s.players.length;
+    s.phase = "draw";
+    s.lastRoundSummary = null;
+    this.startRound();
+  },
+
+  serialize(){ return { kind:"canastra", state: this.state, meldSeq: this._meldSeq, undo: this.undoStack }; },
+  deserialize(obj){
+    this.state = obj.state;
+    this._meldSeq = obj.meldSeq || 1;
+    this.undoStack = obj.undo || [];
+    /* Garantir campos novos em saves antigos */
+    if (this.state.viewerIdx == null) this.state.viewerIdx = this.state.turn || 0;
+    if (this.state.handoffPending == null) this.state.handoffPending = false;
+    if (this.state.lastHumanViewer === undefined) this.state.lastHumanViewer = null;
+    this.emit();
+  }
+};
+
+/* ====== 7. CANASTRA AI ====== */
+const CanastraAI = {
+  findGroups(hand){
+    const byRank = {}, bySuit = {}, jokers = [];
+    for (const c of hand){
+      if (c.joker){ jokers.push(c); continue; }
+      (byRank[c.rank] = byRank[c.rank] || []).push(c);
+      (bySuit[c.suit] = bySuit[c.suit] || []).push(c);
+    }
+    const groups = [];
+    for (const rank in byRank){
+      const naturals = byRank[rank];
+      if (naturals.length >= 3)
+        groups.push({ type:"set", rank, cards: naturals.slice(), natural: naturals.length });
+      else if (naturals.length === 2 && jokers.length >= 1)
+        groups.push({ type:"set", rank, cards: naturals.slice(), natural: 2, needJoker: 1 });
+    }
+    for (const suit in bySuit){
+      const sorted = bySuit[suit].slice().sort((a, b) => C_ORDER[a.rank] - C_ORDER[b.rank]);
+      let i = 0;
+      while (i < sorted.length){
+        let j = i;
+        while (j + 1 < sorted.length && C_ORDER[sorted[j + 1].rank] === C_ORDER[sorted[j].rank] + 1) j++;
+        const runLen = j - i + 1;
+        if (runLen >= 3)
+          groups.push({ type:"sequence", suit, cards: sorted.slice(i, j + 1), natural: runLen });
+        i = j + 1;
+      }
+    }
+    groups.sort((a, b) => b.natural - a.natural);
+    return { groups, jokers, byRank, bySuit };
+  },
+
+  cardUtility(card, hand, difficulty){
+    if (card.joker) return 1000;
+    const same = hand.filter(c => !c.joker && c.rank === card.rank).length;
+    const base = CARD_POINTS[card.rank] || 0;
+    let util = same * 14 + base;
+    if (same >= 3) util += 26;
+    else if (same === 2) util += 12;
+    if (difficulty === "hard" && base <= 5 && same <= 1) util -= 4;
+    return util;
+  },
+
+  play(idx){
+    const s = Canastra.state;
+    if (!s || s.phase === "roundEnd" || s.phase === "gameOver") return;
+    const p = s.players[idx];
+    if (!p || !p.isAI) return;
+
+    const diff = s.config.difficulty || "medium";
+
+    const canTake = Canastra.canTakeDiscard(idx);
+    let tookPile = false;
+
+    if (canTake){
+      const top = s.discard[s.discard.length - 1];
+      const pileSize = s.discard.length;
+      const handNatural = p.hand.filter(c => !c.joker && c.rank === top.rank).length;
+      const jokersInHand = p.hand.filter(c => c.joker).length;
+      let take = false;
+      if (diff === "easy") take = pileSize >= 6 || rnd(10) < 4;
+      else if (diff === "medium") take = pileSize >= 5 || (pileSize >= 3 && handNatural >= 2);
+      else take = pileSize >= 4 || (handNatural >= 2 && jokersInHand >= 1) || pileSize >= 3;
+      if (jokersInHand > 2 && diff !== "hard") take = false;
+      if (take){
+        Canastra.takeDiscard(idx);
+        tookPile = true;
+      }
+    }
+
+    if (!tookPile){
+      if (s.stock.length === 0){ Canastra.endRound(null, "Monte esgotado"); return; }
+      Canastra.drawStock(idx);
+    }
+
+    if (s.phase !== "act") return;
+
+    let safety = 0;
+    while (safety++ < 12){
+      const { groups } = this.findGroups(p.hand);
+      const team = s.teams[p.team];
+      let didSomething = false;
+
+      outer:
+      for (const meld of team.melds){
+        const handCopy = p.hand.slice();
+        for (const c of handCopy){
+          const res = Canastra.addToMeld(idx, meld.id, [c.id]);
+          if (res.ok){ didSomething = true; break outer; }
+        }
+      }
+      if (didSomething) continue;
+
+      const g = groups.find(gr => gr.natural >= 3) || groups.find(gr => gr.natural >= 2);
+      if (g){
+        const cards = g.cards.slice();
+        if (g.natural < 3){
+          const joker = p.hand.find(c => c.joker);
+          if (joker) cards.push(joker);
+        }
+        if (cards.length >= 3){
+          const res = Canastra.meld(idx, cards.map(c => c.id));
+          if (res.ok){ didSomething = true; continue; }
+        }
+      }
+
+      if (!didSomething && diff !== "easy"){
+        const jokers = p.hand.filter(c => c.joker);
+        if (jokers.length > 0){
+          const { byRank } = this.findGroups(p.hand);
+          const cand = Object.keys(byRank)
+            .filter(r => byRank[r].length === 2)
+            .sort((a, b) => (CARD_POINTS[b] || 0) - (CARD_POINTS[a] || 0));
+          if (cand.length){
+            const rank = cand[0];
+            const cards = byRank[rank].concat([jokers[0]]);
+            const res = Canastra.meld(idx, cards.map(c => c.id));
+            if (res.ok){ didSomething = true; continue; }
+          }
+        }
+      }
+
+      if (!didSomething) break;
+    }
+
+    if (s.phase !== "act") return;
+    if (s.mustMeldRank) s.mustMeldRank = null;
+
+    const hand = p.hand;
+    if (hand.length === 0) return;
+
+    const canBat = Canastra.teamHasCanastra(p.team);
+
+    if (hand.length === 1 && canBat){
+      Canastra.discard(idx, hand[0].id);
+      return;
+    }
+    if (hand.length === 1 && !canBat){
+      Canastra.endRound(null, "Sem jogadas possíveis");
+      return;
+    }
+
+    let worst = hand[0], worstScore = Infinity;
+    for (const c of hand){
+      let sc = this.cardUtility(c, hand, diff);
+      if (diff === "easy") sc += rnd(20);
+      else if (diff === "medium") sc += rnd(8);
+      if (c.joker) sc += 500;
+      if (sc < worstScore){ worstScore = sc; worst = c; }
+    }
+
+    Canastra.discard(idx, worst.id);
+  }
+};
+
+/* ====== 8. POKER ENGINE ====== */
+const P_SUITS = ["♠","♥","♦","♣"];
+const P_RANKS = ["2","3","4","5","6","7","8","9","10","J","Q","K","A"];
+const RANK_VAL = { "2":2,"3":3,"4":4,"5":5,"6":6,"7":7,"8":8,"9":9,"10":10,"J":11,"Q":12,"K":13,"A":14 };
+
+function buildPokerDeck(){
+  const deck = [];
+  let id = 0;
+  for (const s of P_SUITS)
+    for (const r of P_RANKS)
+      deck.push({ id:"p" + (id++), rank:r, suit:s, joker:false });
+  return deck;
+}
+
+function evaluate5(cards){
+  const ranks = cards.map(c => RANK_VAL[c.rank]).sort((a, b) => b - a);
+  const suits = cards.map(c => c.suit);
+  const isFlush = suits.every(s => s === suits[0]);
+  const cnt = {};
+  for (const r of ranks) cnt[r] = (cnt[r] || 0) + 1;
+  const groups = Object.keys(cnt).map(r => ({ r:+r, c:cnt[r] }))
+    .sort((a, b) => (b.c - a.c) || (b.r - a.r));
+  const uniq = Array.from(new Set(ranks)).sort((a, b) => b - a);
+  let straightHigh = 0;
+  if (uniq.length === 5){
+    if (uniq[0] - uniq[4] === 4) straightHigh = uniq[0];
+    else if (uniq[0] === 14 && uniq[1] === 5) straightHigh = 5;
+  }
+  if (isFlush && straightHigh){
+    if (straightHigh === 14) return { cat:9, tb:[14], name:"Royal Flush" };
+    return { cat:8, tb:[straightHigh], name:"Straight Flush" };
+  }
+  if (groups[0].c === 4) return { cat:7, tb:[groups[0].r, groups[1].r], name:"Quadra" };
+  if (groups[0].c === 3 && groups[1] && groups[1].c === 2) return { cat:6, tb:[groups[0].r, groups[1].r], name:"Full House" };
+  if (isFlush) return { cat:5, tb:ranks, name:"Flush" };
+  if (straightHigh) return { cat:4, tb:[straightHigh], name:"Sequência" };
+  if (groups[0].c === 3) return { cat:3, tb:[groups[0].r, groups[1].r, groups[2].r], name:"Trinca" };
+  if (groups[0].c === 2 && groups[1] && groups[1].c === 2) return { cat:2, tb:[groups[0].r, groups[1].r, groups[2].r], name:"Dois Pares" };
+  if (groups[0].c === 2) return { cat:1, tb:[groups[0].r, groups[1].r, groups[2].r, groups[3].r], name:"Par" };
+  return { cat:0, tb:ranks, name:"Carta Alta" };
+}
+
+function compareEval(a, b){
+  if (a.cat !== b.cat) return a.cat - b.cat;
+  const len = Math.max(a.tb.length, b.tb.length);
+  for (let i = 0; i < len; i++){
+    const x = a.tb[i] || 0, y = b.tb[i] || 0;
+    if (x !== y) return x - y;
+  }
+  return 0;
+}
+
+function combinations(arr, k){
+  const out = [], n = arr.length, idx = [];
+  (function rec(start){
+    if (idx.length === k){ out.push(idx.map(i => arr[i])); return; }
+    for (let i = start; i < n; i++){ idx.push(i); rec(i + 1); idx.pop(); }
+  })(0);
+  return out;
+}
+
+function evaluateHand(cards){
+  if (!cards || cards.length < 5) return null;
+  if (cards.length === 5) return evaluate5(cards);
+  const combos = combinations(cards, 5);
+  let best = null;
+  for (const c of combos){
+    const e = evaluate5(c);
+    if (!best || compareEval(e, best) > 0) best = e;
+  }
+  return best;
+}
+
+const Poker = {
+  state: null, onChange: null, _aiBusy: false,
+
+  newGame(cfg){
+    const names = [cfg.playerName || "Você", "Ana (IA)", "Bruno (IA)", "Carla (IA)"];
+    this.state = {
+      config: cfg,
+      players: names.map((n, i) => ({
+        idx: i, name: n, isAI: i > 0,
+        stack: cfg.stack, hand: [], bet: 0, totalBet: 0,
+        folded: false, allIn: false, out: false, acted: false,
+        lastAction: "", evalResult: null
+      })),
+      deck: [], community: [], pot: 0, currentBet: 0, minRaise: cfg.bigBlind,
+      dealer: 0, turn: 0, phase: "idle",
+      handNumber: 0, sb: cfg.smallBlind, bb: cfg.bigBlind,
+      difficulty: cfg.difficulty, message: "", winners: [], lastResults: [], log: []
+    };
+    Store.stats.poker.hands = Store.stats.poker.hands || 0;
+    this.log("Nova mesa de Texas Hold'em.");
+    this.startHand();
+  },
+
+  log(m){
+    if (!this.state) return;
+    this.state.log.push(m);
+    if (this.state.log.length > 200) this.state.log.shift();
+    UI.devLog("[POKER] " + m);
+  },
+
+  emit(){ if (this.onChange) this.onChange(); },
+
+  nextActive(i){
+    const s = this.state, n = s.players.length;
+    let x = (i + 1) % n, g = 0;
+    while ((s.players[x].folded || s.players[x].out) && g++ < 20) x = (x + 1) % n;
+    return x;
+  },
+  nextToAct(i){
+    const s = this.state, n = s.players.length;
+    let x = (i + 1) % n, g = 0;
+    while ((s.players[x].folded || s.players[x].out || s.players[x].allIn) && g++ < 30) x = (x + 1) % n;
+    return x;
+  },
+  activePlayers(){ return this.state.players.filter(p => !p.folded && !p.out); },
+
+  startHand(){
+    const s = this.state;
+    s.handNumber++;
+    s.deck = shuffle(buildPokerDeck());
+    s.community = [];
+    s.pot = 0;
+    s.currentBet = 0;
+    s.minRaise = s.bb;
+    s.phase = "preflop";
+    s.winners = [];
+    s.lastResults = [];
+    s.message = "";
+
+    s.players.forEach(p => {
+      p.hand = []; p.bet = 0; p.totalBet = 0;
+      p.folded = false; p.allIn = false; p.acted = false;
+      p.lastAction = ""; p.evalResult = null;
+      if (p.stack <= 0) p.out = true;
+    });
+
+    let g = 0;
+    while (s.players[s.dealer].out && g++ < 10) s.dealer = (s.dealer + 1) % s.players.length;
+
+    const inPlay = s.players.filter(p => !p.out);
+    if (inPlay.length < 2){ this.endGame(); return; }
+
+    for (let k = 0; k < 2; k++)
+      for (const p of inPlay) p.hand.push(s.deck.pop());
+
+    let sbIdx, bbIdx;
+    if (inPlay.length === 2){ sbIdx = s.dealer; bbIdx = this.nextActive(s.dealer); }
+    else { sbIdx = this.nextActive(s.dealer); bbIdx = this.nextActive(sbIdx); }
+
+    this.postBlind(sbIdx, s.sb);
+    this.postBlind(bbIdx, s.bb);
+    s.currentBet = s.bb;
+    s.minRaise = s.bb;
+    s.players.forEach(p => p.acted = false);
+    s.turn = this.nextToAct(bbIdx);
+
+    AudioManager.shuffle();
+    setTimeout(() => AudioManager.deal(), 120);
+    this.log(`--- Mão #${s.handNumber} ---`);
+    Store.stats.poker.hands++;
+    Store.save();
+    this.emit();
+    this.scheduleAI();
+  },
+
+  postBlind(idx, amount){
+    const s = this.state, p = s.players[idx];
+    const amt = Math.min(amount, p.stack);
+    p.stack -= amt; p.bet += amt; p.totalBet += amt; s.pot += amt;
+    if (p.stack === 0) p.allIn = true;
+    p.lastAction = amount === s.sb ? "SB" : "BB";
+  },
+
+  roundComplete(){
+    const s = this.state;
+    const alive = s.players.filter(p => !p.folded && !p.out);
+    if (alive.length <= 1) return true;
+    const canAct = alive.filter(p => !p.allIn);
+    if (canAct.length === 0) return true;
+    return canAct.every(p => p.acted && p.bet === s.currentBet);
+  },
+
+  act(idx, action, amount){
+    const s = this.state;
+    if (!s) return { ok:false };
+    if (s.phase === "showdown" || s.phase === "gameover" || s.phase === "handover") return { ok:false };
+    const p = s.players[idx];
+    if (!p || p.folded || p.allIn || p.out) return { ok:false };
+    if (s.turn !== idx) return { ok:false };
+
+    const toCall = Math.max(0, s.currentBet - p.bet);
+
+    switch (action){
+      case "fold":
+        p.folded = true; p.lastAction = "Fold"; AudioManager.card();
+        break;
+      case "check":
+        if (toCall > 0) return { ok:false, msg:"Check inválido — há aposta pendente." };
+        p.lastAction = "Check"; AudioManager.chip();
+        break;
+      case "call": {
+        const amt = Math.min(toCall, p.stack);
+        p.stack -= amt; p.bet += amt; p.totalBet += amt; s.pot += amt;
+        if (p.stack === 0) p.allIn = true;
+        p.lastAction = amt < toCall ? "All-in" : "Call " + amt;
+        if (p.allIn) Store.stats.poker.allins++;
+        AudioManager.chip();
+        break;
+      }
+      case "raise": {
+        let target = Math.round(amount);
+        const maxTarget = p.bet + p.stack;
+        const minTarget = s.currentBet + s.minRaise;
+        if (target > maxTarget) target = maxTarget;
+        if (target < minTarget && maxTarget >= minTarget) target = minTarget;
+        target = Math.min(target, maxTarget);
+        const amt = target - p.bet;
+        if (amt <= 0) return { ok:false, msg:"Valor de aumento inválido." };
+        p.stack -= amt; p.bet += amt; p.totalBet += amt; s.pot += amt;
+        if (p.stack === 0) p.allIn = true;
+        s.minRaise = Math.max(s.minRaise, target - s.currentBet);
+        s.currentBet = Math.max(s.currentBet, target);
+        s.players.forEach(q => { if (q !== p && !q.folded && !q.out && !q.allIn) q.acted = false; });
+        p.lastAction = p.allIn ? "All-in " + target : "Raise " + target;
+        if (p.allIn) Store.stats.poker.allins++;
+        AudioManager.chip();
+        break;
+      }
+      default: return { ok:false };
+    }
+
+    p.acted = true;
+    Store.save();
+
+    const alive = s.players.filter(q => !q.folded && !q.out);
+    if (alive.length === 1){ this.awardUncontested(alive[0]); return { ok:true }; }
+
+    if (this.roundComplete()){ this.nextPhase(); return { ok:true }; }
+
+    const nxt = this.nextToAct(idx);
+    if (nxt === idx){ this.nextPhase(); return { ok:true }; }
+    s.turn = nxt;
+    this.emit();
+    this.scheduleAI();
+    return { ok:true };
+  },
+
+  awardUncontested(winner){
+    const s = this.state;
+    s.phase = "handover";
+    winner.stack += s.pot;
+    s.winners = [winner.idx];
+    s.lastResults = [{ amount: s.pot, winners: [winner.name], hand: "Todos desistiram" }];
+    s.message = `${winner.name} venceu o pote de ${s.pot} fichas.`;
+    s.pot = 0;
+    this.log(s.message);
+    if (winner.idx === 0){ Store.stats.poker.wins++; AudioManager.win(); }
+    else AudioManager.lose();
+    Store.save();
+    this.emit();
+    setTimeout(() => this.showdownModal(), 500);
+  },
+
+  nextPhase(){
+    const s = this.state;
+    s.players.forEach(p => { p.bet = 0; p.acted = false; p.lastAction = ""; });
+    s.currentBet = 0;
+    s.minRaise = s.bb;
+
+    if (s.phase === "preflop"){ s.phase = "flop"; this.dealCommunity(3); }
+    else if (s.phase === "flop"){ s.phase = "turn"; this.dealCommunity(1); }
+    else if (s.phase === "turn"){ s.phase = "river"; this.dealCommunity(1); }
+    else { s.phase = "showdown"; this.showdown(); return; }
+
+    s.players.forEach(p => { if (p.allIn || p.folded || p.out) p.acted = true; });
+    const canAct = s.players.filter(p => !p.folded && !p.out && !p.allIn);
+    if (canAct.length <= 1){ this.nextPhase(); return; }
+
+    s.turn = this.nextToAct(s.dealer);
+    this.log(`Fase: ${s.phase} — pote ${s.pot}`);
+    this.emit();
+    this.scheduleAI();
+  },
+
+  dealCommunity(n){
+    const s = this.state;
+    if (s.deck.length > 0) s.deck.pop();
+    for (let i = 0; i < n; i++) if (s.deck.length) s.community.push(s.deck.pop());
+    AudioManager.deal();
+  },
+
+  showdown(){
+    const s = this.state;
+    s.phase = "showdown";
+    Store.stats.poker.showdowns++;
+
+    const contenders = s.players.filter(p => !p.folded && !p.out);
+    for (const p of contenders) p.evalResult = evaluateHand(p.hand.concat(s.community));
+
+    const pots = this.buildPots(s.players);
+    const results = [];
+    const winnerSet = new Set();
+
+    for (const pot of pots){
+      const elig = pot.eligible.filter(p => contenders.includes(p));
+      if (!elig.length) continue;
+      let best = null, winners = [];
+      for (const p of elig){
+        if (!best || compareEval(p.evalResult, best) > 0){ best = p.evalResult; winners = [p]; }
+        else if (compareEval(p.evalResult, best) === 0) winners.push(p);
+      }
+      const share = Math.floor(pot.amount / winners.length);
+      let rem = pot.amount - share * winners.length;
+      winners.forEach((w, i) => { w.stack += share + (i < rem ? 1 : 0); winnerSet.add(w.idx); });
+      results.push({ amount: pot.amount, winners: winners.map(w => w.name), hand: best ? best.name : "—" });
+    }
+
+    s.winners = Array.from(winnerSet);
+    s.lastResults = results;
+
+    const totalPot = results.reduce((a, r) => a + r.amount, 0);
+    if (totalPot > Store.stats.poker.bestPot) Store.stats.poker.bestPot = totalPot;
+    if (s.winners.indexOf(0) >= 0) Store.stats.poker.wins++;
+
+    for (const p of contenders)
+      if (p.evalResult && p.evalResult.cat === 9){
+        Store.stats.poker.royalFlush = (Store.stats.poker.royalFlush || 0) + 1;
+        Achievements.unlock("royal_flush");
+      }
+    if (totalPot >= 5000 && s.winners.indexOf(0) >= 0) Achievements.unlock("big_pot");
+    if (s.players[0].allIn && s.winners.indexOf(0) >= 0) Achievements.unlock("allin_win");
+
+    s.message = results.map(r => `${r.winners.join(" e ")} venceu ${r.amount} com ${r.hand}`).join(" | ");
+    s.pot = 0;
+    Store.save();
+    this.log("Showdown: " + s.message);
+
+    if (s.winners.indexOf(0) >= 0){ AudioManager.win(); vibrate([30, 50, 30]); }
+    else AudioManager.lose();
+
+    this.emit();
+    setTimeout(() => this.showdownModal(), 550);
+  },
+
+  buildPots(players){
+    const pots = [];
+    const levels = Array.from(new Set(players.filter(p => p.totalBet > 0).map(p => p.totalBet))).sort((a, b) => a - b);
+    let prev = 0;
+    for (const lvl of levels){
+      let amount = 0;
+      const eligible = [];
+      for (const p of players){
+        const contrib = Math.min(p.totalBet, lvl) - Math.min(p.totalBet, prev);
+        if (contrib > 0) amount += contrib;
+        if (p.totalBet >= lvl && !p.folded && !p.out) eligible.push(p);
+      }
+      if (amount > 0) pots.push({ amount, eligible });
+      prev = lvl;
+    }
+    return pots;
+  },
+
+  showdownModal(){
+    const s = this.state;
+    UI.showPokerResult(s.lastResults, s.winners.indexOf(0) >= 0, () => {
+      const alive = s.players.filter(p => p.stack > 0);
+      if (alive.length < 2 || (s.players[0].stack <= 0)) this.endGame();
+      else { s.dealer = (s.dealer + 1) % s.players.length; this.startHand(); }
+    });
+  },
+
+  endGame(){
+    const s = this.state;
+    s.phase = "gameover";
+    const human = s.players[0];
+    const won = human.stack > 0 && s.players.filter(p => p.stack > 0).length <= 1;
+    Store.registerGame("poker", won);
+    Achievements.checkGlobal();
+    Store.save();
+    this.emit();
+    UI.showPokerEnd(human.stack, won);
+  },
+
+  scheduleAI(){
+    if (this._aiBusy) return;
+    const s = this.state;
+    if (!s) return;
+    if (s.phase === "showdown" || s.phase === "gameover" || s.phase === "handover") return;
+    const p = s.players[s.turn];
+    if (!p || !p.isAI) return;
+
+    this._aiBusy = true;
+    const self = this;
+    (function step(){
+      const st = self.state;
+      if (!st || st.phase === "showdown" || st.phase === "gameover" || st.phase === "handover"){
+        self._aiBusy = false; return;
+      }
+      const cur = st.players[st.turn];
+      if (!cur || !cur.isAI){ self._aiBusy = false; self.emit(); return; }
+
+      const delay = st.difficulty === "easy" ? 700 : st.difficulty === "medium" ? 900 : 1050;
+      setTimeout(() => {
+        const st2 = self.state;
+        if (!st2 || st2.phase === "showdown" || st2.phase === "gameover" || st2.phase === "handover"){
+          self._aiBusy = false; return;
+        }
+        const cur2 = st2.players[st2.turn];
+        if (!cur2 || !cur2.isAI){ self._aiBusy = false; self.emit(); return; }
+        const dec = PokerAI.decide(cur2);
+        self.act(cur2.idx, dec.action, dec.amount);
+        self.emit();
+        step();
+      }, delay);
+    })();
+  },
+
+  serialize(){ return { kind:"poker", state: this.state }; },
+  deserialize(obj){
+    this.state = obj.state;
+    this._aiBusy = false;
+    this.emit();
+    this.scheduleAI();
+  }
+};
+
+/* ====== 9. POKER AI ====== */
+const PokerAI = {
+  equity(hole, board, nOpp, iters){
+    const known = hole.concat(board).map(c => c.id);
+    const knownSet = new Set(known);
+    const full = buildPokerDeck();
+    const remaining = full.filter(c => !knownSet.has(c.id));
+    let score = 0;
+    const need = 5 - board.length;
+
+    for (let it = 0; it < iters; it++){
+      const pool = remaining.slice();
+      shuffle(pool);
+      let ptr = 0;
+      const extra = [];
+      for (let k = 0; k < need; k++) extra.push(pool[ptr++]);
+      const fullBoard = board.concat(extra);
+      const heroEval = evaluateHand(hole.concat(fullBoard));
+
+      let better = false, ties = 1;
+      for (let o = 0; o < nOpp; o++){
+        const oh = [pool[ptr++], pool[ptr++]];
+        const oe = evaluateHand(oh.concat(fullBoard));
+        const cmp = compareEval(oe, heroEval);
+        if (cmp > 0){ better = true; break; }
+        if (cmp === 0) ties++;
+      }
+      if (!better) score += (ties > 1 ? 1 / ties : 1);
+    }
+    return score / iters;
+  },
+
+  decide(p){
+    const s = Poker.state;
+    const opp = s.players.filter(x => !x.folded && !x.out && x !== p).length;
+    const diff = s.difficulty;
+    const iters = diff === "easy" ? 70 : diff === "medium" ? 160 : 300;
+    const noise = diff === "easy" ? 0.16 : diff === "medium" ? 0.075 : 0.03;
+
+    let eq = 0.5;
+    try{ eq = this.equity(p.hand, s.community, Math.max(1, opp), iters); }catch(e){ eq = 0.5; }
+    eq += (Math.random() - 0.5) * noise * 2;
+    eq = Math.max(0.01, Math.min(0.99, eq));
+
+    const toCall = Math.max(0, s.currentBet - p.bet);
+    const pot = s.pot;
+    const r = Math.random();
+
+    if (s.community.length === 0){
+      const v1 = RANK_VAL[p.hand[0].rank], v2 = RANK_VAL[p.hand[1].rank];
+      const suited = p.hand[0].suit === p.hand[1].suit;
+      const pair = v1 === v2;
+      let bonus = 0;
+      if (pair) bonus += 0.18 + (v1 - 2) * 0.012;
+      if (v1 >= 12) bonus += 0.07;
+      if (v2 >= 12) bonus += 0.05;
+      if (suited) bonus += 0.04;
+      if (Math.abs(v1 - v2) === 1) bonus += 0.03;
+      eq += bonus;
+      if (diff === "easy") eq -= 0.04;
+    }
+
+    const canCheck = toCall <= 0;
+    const raiseTo = () => {
+      const potRaise = Math.max(s.minRaise, Math.round((pot + toCall) * (0.5 + r * 0.6)));
+      let target = s.currentBet + potRaise;
+      const maxTarget = p.bet + p.stack;
+      if (target >= maxTarget) return maxTarget;
+      return Math.max(target, s.currentBet + s.minRaise);
+    };
+
+    if (canCheck){
+      if (eq > 0.80 && r < 0.85) return { action:"raise", amount: raiseTo() };
+      if (eq > 0.62 && r < 0.55) return { action:"raise", amount: raiseTo() };
+      if (diff === "hard" && eq < 0.32 && r < 0.12) return { action:"raise", amount: raiseTo() };
+      return { action:"check" };
+    }
+
+    const potOdds = toCall / (pot + toCall);
+
+    if (eq < potOdds * 0.86 && !(diff === "easy" && r < 0.18)){
+      if (toCall > p.stack * 0.35 || eq < potOdds * 0.6) return { action:"fold" };
+    }
+
+    if (eq > 0.84 && r < 0.8) return { action:"raise", amount: p.bet + p.stack };
+    if (eq > 0.70 && r < 0.6) return { action:"raise", amount: raiseTo() };
+    if (eq > potOdds + 0.22 && r < 0.32) return { action:"raise", amount: raiseTo() };
+    return { action:"call" };
+  }
+};
+
+/* ====== 10. UI ====== */
+const UI = {
+  currentScreen: "menu",
+  selectedCards: new Set(),
+  selectedMeld: null,
+  deferredPrompt: null,
+  _handoffModalOpen: false,
+  _lastRenderedViewer: null,
+
+  showScreen(id){
+    $$(".screen").forEach(s => s.classList.toggle("active", s.id === "screen-" + id));
+    this.currentScreen = id;
+    const inGame = (id === "canastra" || id === "poker");
+    $("#btn-back").hidden = (id === "menu");
+    $("#btn-back").textContent = inGame ? "⏸ Menu" : "◀ Voltar";
+    $("#btn-pause").hidden = !inGame;
+    if (id === "stats") this.renderStats();
+    if (id === "achievements") this.renderAchievements();
+    if (id === "settings") this.renderSettings();
+    if (id === "menu") this.renderMenu();
+  },
+
+  renderMenu(){
+    const hasSave = !!Store.data.save;
+    $("#btn-resume").hidden = !hasSave;
+    if (hasSave){
+      const k = Store.data.save.kind === "canastra" ? "Canastra" : "Poker";
+      $("#btn-resume").textContent = "▶ Continuar partida de " + k;
+    }
+  },
+
+  toast(msg, type, ms){
+    const t = makeEl("div", "toast" + (type ? " " + type : ""), msg);
+    $("#toast-root").appendChild(t);
+    setTimeout(() => { if (t.parentNode) t.parentNode.removeChild(t); }, ms || 2600);
+  },
+
+  modal(opts){
+    const back = makeEl("div", "modal-back" + (opts.handoff ? " handoff" : ""));
+    const box = makeEl("div", "modal");
+    let html = "";
+    if (opts.icon) html += `<div class="modal-icon">${opts.icon}</div>`;
+    html += `<h3>${opts.title || ""}</h3>`;
+    html += `<div class="modal-body">${opts.body || ""}</div>`;
+    html += `<div class="modal-actions" id="modal-actions"></div>`;
+    box.innerHTML = html;
+    back.appendChild(box);
+    document.body.appendChild(back);
+
+    const actions = $("#modal-actions", box);
+    (opts.actions || []).forEach(a => {
+      const b = makeEl("button", "btn " + (a.cls || "primary"), a.label);
+      b.addEventListener("click", () => {
+        if (a.keepOpen !== true && back.parentNode) back.parentNode.removeChild(back);
+        if (a.fn) a.fn();
+      });
+      actions.appendChild(b);
+    });
+
+    if (opts.dismissible){
+      back.addEventListener("click", e => {
+        if (e.target === back && back.parentNode) back.parentNode.removeChild(back);
+      });
+    }
+    return back;
+  },
+
+  closeAllModals(){
+    $$(".modal-back").forEach(m => m.parentNode && m.parentNode.removeChild(m));
+    UI._handoffModalOpen = false;
+  },
+
+  devLog(msg){
+    if (!Store.settings.devLog) return;
+    const box = $("#dev-log");
+    if (!box) return;
+    box.appendChild(makeEl("div", "", msg));
+    box.scrollTop = box.scrollHeight;
+    while (box.childNodes.length > 200) box.removeChild(box.firstChild);
+  },
+
+  /* ========= CANASTRA ========= */
+  renderCanastra(){
+    const s = Canastra.state;
+    if (!s) return;
+
+    /* ---- Modal de passe (pass-and-play) ---- */
+    if (s.handoffPending && !this._handoffModalOpen){
+      this._handoffModalOpen = true;
+      const p = s.players[s.turn];
+      AudioManager.handoff();
+      vibrate([15, 40, 15]);
+      this.modal({
+        handoff: true,
+        icon: "🤝",
+        title: "Passe o dispositivo",
+        body: `<p style="text-align:center;font-size:17px;color:#eaf3ff;margin:10px 0 6px;">Vez de <b>${this.esc(p.name)}</b></p>
+               <p style="text-align:center;color:#8ea3bd;font-size:12.5px;line-height:1.5;">
+                 Entregue o aparelho para <b>${this.esc(p.name)}</b>.<br>
+                 Toque em <b>Estou pronto</b> para continuar.
+               </p>`,
+        actions: [{
+          label: "✅ Estou pronto", cls: "primary",
+          fn: () => {
+            UI._handoffModalOpen = false;
+            s.handoffPending = false;
+            Canastra.emit();
+          }
+        }],
+        dismissible: false
+      });
+    }
+
+    /* ---- Troca de viewer limpa seleção ---- */
+    if (this._lastRenderedViewer !== s.viewerIdx){
+      this.selectedCards.clear();
+      this.selectedMeld = null;
+      this._lastRenderedViewer = s.viewerIdx;
+    }
+
+    const viewerIdx = s.viewerIdx;
+    const viewer = s.players[viewerIdx];
+    const viewerIsHuman = !viewer.isAI;
+    const opponents = s.players.filter((p, i) => i !== viewerIdx);
+    const isMyTurn = (s.turn === viewerIdx) && viewerIsHuman && !s.handoffPending
+                     && (s.phase !== "roundEnd") && (s.phase !== "gameOver");
+
+    let html = "";
+
+    /* ---- Oponentes (topo) ---- */
+    html += `<div class="opp-row">`;
+    for (const p of opponents){
+      const active = (s.turn === p.idx && s.phase !== "roundEnd" && s.phase !== "gameOver") ? " active" : "";
+      const humanCls = p.isAI ? "" : " is-human";
+      const tag = p.isAI ? "" : `<span class="human-tag">HUMANO</span>`;
+      /* Em modo reveal, mostra faces; caso contrário, costas */
+      const reveal = s.revealAll;
+      const cards = reveal
+        ? p.hand.map(c => cardHTML(c, "mini")).join("")
+        : p.hand.map(() => `<div class="mini-back"></div>`).join("");
+      html += `<div class="opp-panel${active}${humanCls}">
+        ${tag}
+        <div class="opp-name">${this.esc(p.name)} <span class="team-tag">${this.esc(s.teams[p.team].name)}</span></div>
+        <div class="opp-hand">${cards}</div>
+        <div class="opp-count">${p.hand.length} cartas · ${s.teams[p.team].score} pts</div>
+      </div>`;
+    }
+    html += `</div>`;
+
+    /* ---- Centro: monte, lixo, mesa ---- */
+    const canDraw = isMyTurn && s.phase === "draw";
+    const canTake = isMyTurn && Canastra.canTakeDiscard(viewerIdx);
+
+    html += `<div class="center-area">
+      <div class="piles">
+        <div class="pile${canDraw ? "" : " disabled"}" data-action="draw" role="button" aria-label="Comprar do monte">
+          <div class="pile-label">MONTE</div>
+          ${cardBackHTML("mini")}
+          <div class="pile-count">${s.stock.length}</div>
+        </div>
+        <div class="pile${canTake ? "" : " disabled"}" data-action="take" role="button" aria-label="Pegar o lixo">
+          <div class="pile-label">LIXO</div>
+          ${s.discard.length ? cardHTML(s.discard[s.discard.length - 1], "mini") : `<div class="card mini placeholder"></div>`}
+          <div class="pile-count">${s.discard.length}</div>
+        </div>
+      </div>
+      <div class="melds-area" id="melds-area">`;
+
+    for (const t of s.teams){
+      html += `<div class="team-melds">
+        <div class="team-melds-title">${this.esc(t.name)} — ${t.score} pts</div>
+        <div class="melds-row">`;
+      if (!t.melds.length){
+        html += `<span class="empty-melds">Nenhum jogo baixado</span>`;
+      } else {
+        for (const m of t.melds){
+          const isCanastra = m.cards.length >= 7;
+          const clean = isCanastra && m.cards.every(c => !c.joker);
+          let badge, badgeCls = "";
+          if (isCanastra){
+            badge = clean ? "CANASTRA LIMPA" : "CANASTRA SUJA";
+          } else if (m.type === "sequence"){
+            badge = "SEQ " + m.suit; badgeCls = "seq";
+          } else {
+            badge = "SET " + m.rank; badgeCls = "set";
+          }
+          const selCls = (this.selectedMeld === m.id && t.id === viewer.team) ? " sel" : "";
+          html += `<div class="meld${selCls}" data-meld="${m.id}" role="button" aria-label="Jogo">
+            <span class="meld-badge ${badgeCls}">${badge}</span>
+            ${m.cards.map(c => cardHTML(c, "mini")).join("")}
+          </div>`;
+        }
+      }
+      html += `</div></div>`;
+    }
+
+    html += `</div></div>`;
+
+    /* ---- Mão inferior ---- */
+    const handHidden = s.handoffPending || !viewerIsHuman;
+    const statusText = (s.phase === "roundEnd" || s.phase === "gameOver")
+      ? "Rodada encerrada"
+      : (!viewerIsHuman
+          ? "Aguardando…"
+          : (isMyTurn
+              ? (s.phase === "draw"
+                  ? `${viewer.name} — compre do monte ou pegue o lixo`
+                  : (s.mustMeldRank ? `Baixe um jogo de ${s.mustMeldRank} antes de descartar` : "Sua vez — baixe jogos e descarte"))
+              : `Vez de ${this.esc(s.players[s.turn] ? s.players[s.turn].name : "…")}`));
+
+    html += `<div class="hand-area">
+      <div class="hand-toolbar">
+        <span class="turn-indicator${isMyTurn ? " mine" : ""}">${statusText}</span>
+        ${viewerIsHuman ? `<span class="hint">💡 Segure uma carta para reordenar</span>` : ``}
+        <button class="btn tiny ghost" data-action="sort" aria-label="Ordenar cartas" ${viewerIsHuman && !handHidden ? "" : "disabled"}>⇅ Ordenar</button>
+        <button class="btn tiny ghost" data-action="undo" aria-label="Desfazer" ${Canastra.canUndo() ? "" : "disabled"}>↶ Desfazer</button>
+      </div>
+      <div class="hand" id="canastra-hand">
+        ${handHidden
+          ? viewer.hand.map(() => cardBackHTML("selectable")).join("")
+          : viewer.hand.map(c => cardHTML(c, "selectable", this.selectedCards.has(c.id))).join("")}
+      </div>
+      <div class="actions">
+        <button class="btn ok" data-action="meld" ${this.canMeldNow() ? "" : "disabled"}>⬆ Baixar Jogo</button>
+        <button class="btn" data-action="add" ${this.canAddNow() ? "" : "disabled"}>➕ Adicionar ao Jogo</button>
+        <button class="btn gold" data-action="discard" ${this.canDiscardNow() ? "" : "disabled"}>⬇ Descartar</button>
+      </div>
+    </div>`;
+
+    $("#canastra-wrap").innerHTML = html;
+  },
+
+  canMeldNow(){
+    const s = Canastra.state;
+    if (!s || s.phase !== "act" || s.handoffPending) return false;
+    const me = s.players[s.viewerIdx];
+    if (!me || me.isAI || s.turn !== s.viewerIdx) return false;
+    const sel = me.hand.filter(c => this.selectedCards.has(c.id));
+    if (sel.length < 3) return false;
+    return Canastra.validateGroup(sel).ok;
+  },
+
+  canAddNow(){
+    const s = Canastra.state;
+    if (!s || s.phase !== "act" || s.handoffPending) return false;
+    const me = s.players[s.viewerIdx];
+    if (!me || me.isAI || s.turn !== s.viewerIdx) return false;
+    if (!this.selectedMeld) return false;
+    const meld = s.teams[me.team].melds.find(m => m.id === this.selectedMeld);
+    if (!meld) return false;
+    const sel = me.hand.filter(c => this.selectedCards.has(c.id));
+    if (sel.length === 0) return false;
+    const v = Canastra.validateGroup(meld.cards.concat(sel));
+    return v.ok && v.type === meld.type;
+  },
+
+  canDiscardNow(){
+    const s = Canastra.state;
+    if (!s || s.phase !== "act" || s.handoffPending) return false;
+    const me = s.players[s.viewerIdx];
+    if (!me || me.isAI || s.turn !== s.viewerIdx) return false;
+    if (s.mustMeldRank) return false;
+    return this.selectedCards.size === 1;
+  },
+
+  /* ========= POKER ========= */
+  renderPoker(){
+    const s = Poker.state;
+    if (!s) return;
+    const table = $("#poker-table");
+    const hero = s.players[0];
+    const opps = s.players.slice(1);
+
+    let html = "";
+
+    html += `<div class="poker-opps">`;
+    for (const p of opps){
+      const active = (s.turn === p.idx && s.phase !== "showdown" && s.phase !== "handover" && s.phase !== "gameover") ? " active" : "";
+      const folded = p.folded ? " folded" : "";
+      const out = p.out ? " out" : "";
+      const winner = (s.winners.indexOf(p.idx) >= 0 && s.phase === "showdown") ? " winner" : "";
+      const revealHand = (s.phase === "showdown" && !p.folded);
+      const cards = revealHand
+        ? p.hand.map(c => cardHTML(c, "mini")).join("")
+        : p.hand.map(() => cardBackHTML("mini")).join("");
+      const handName = (s.phase === "showdown" && p.evalResult && !p.folded) ? p.evalResult.name : "";
+      html += `<div class="seat${active}${folded}${out}${winner}">
+        <div class="seat-name">${this.esc(p.name)}</div>
+        <div class="seat-stack">${p.stack.toLocaleString("pt-BR")}</div>
+        <div class="seat-bet">${p.bet > 0 ? "aposta " + p.bet.toLocaleString("pt-BR") : (p.lastAction || "")}</div>
+        <div class="seat-cards">${cards}</div>
+        <div class="seat-hand-name">${handName}</div>
+      </div>`;
+    }
+    html += `</div>`;
+
+    const stageNames = { preflop:"PRÉ-FLOP", flop:"FLOP", turn:"TURN", river:"RIVER", showdown:"SHOWDOWN", handover:"FIM", gameover:"FIM" };
+    html += `<div class="community-zone">
+      <div class="stage-label">${stageNames[s.phase] || ""}</div>
+      <div class="pot-display">POTE: ${s.pot.toLocaleString("pt-BR")}</div>
+      <div class="community">`;
+    for (let i = 0; i < 5; i++){
+      if (i < s.community.length) html += cardHTML(s.community[i]);
+      else html += `<div class="card placeholder"></div>`;
+    }
+    html += `</div></div>`;
+
+    const heroActive = (s.turn === 0 && s.phase !== "showdown" && s.phase !== "handover" && s.phase !== "gameover") ? " active" : "";
+    const heroWinner = (s.winners.indexOf(0) >= 0 && s.phase === "showdown") ? " winner" : "";
+    const heroHandName = (s.phase === "showdown" && hero.evalResult && !hero.folded) ? hero.evalResult.name : "";
+    html += `<div class="hero-zone">
+      <div class="seat${heroActive}${hero.folded ? " folded" : ""}${heroWinner}" style="min-width:130px;">
+        <div class="seat-name">${this.esc(hero.name)}</div>
+        <div class="seat-stack">${hero.stack.toLocaleString("pt-BR")} fichas</div>
+        <div class="seat-bet">${hero.bet > 0 ? "aposta " + hero.bet.toLocaleString("pt-BR") : (hero.lastAction || "")}</div>
+        <div class="seat-hand-name">${heroHandName}</div>
+      </div>
+      <div class="hero-cards">${hero.hand.map(c => cardHTML(c)).join("")}</div>
+    </div>`;
+
+    table.innerHTML = html;
+    $("#poker-status").textContent = s.message || "";
+    this.renderPokerControls();
+  },
+
+  renderPokerControls(){
+    const s = Poker.state;
+    const box = $("#poker-controls");
+    if (!s){ box.innerHTML = ""; return; }
+
+    if (s.phase === "showdown" || s.phase === "handover" || s.phase === "gameover"){
+      box.innerHTML = `<div class="ctrl-row"><button class="btn primary" id="pk-next">▶ Próxima mão</button></div>`;
+      const btn = $("#pk-next");
+      if (btn){
+        btn.addEventListener("click", () => {
+          this.closeAllModals();
+          const alive = s.players.filter(p => p.stack > 0);
+          if (alive.length < 2 || s.players[0].stack <= 0) Poker.endGame();
+          else { s.dealer = (s.dealer + 1) % s.players.length; Poker.startHand(); }
+        });
+      }
+      return;
+    }
+
+    const hero = s.players[0];
+    const myTurn = (s.turn === 0) && !hero.folded && !hero.allIn && !hero.out;
+    const toCall = Math.max(0, s.currentBet - hero.bet);
+    const canCheck = toCall <= 0;
+
+    if (!myTurn){
+      box.innerHTML = `<div class="ctrl-row"><button class="btn" disabled>Aguardando ${this.esc(s.players[s.turn] ? s.players[s.turn].name : "…")}…</button></div>`;
+      return;
+    }
+
+    const minTarget = Math.min(s.currentBet + s.minRaise, hero.bet + hero.stack);
+    const maxTarget = hero.bet + hero.stack;
+    let defaultTarget = Math.min(Math.max(minTarget, s.currentBet + Math.round((s.pot + toCall) * 0.6)), maxTarget);
+
+    box.innerHTML = `
+      <div class="ctrl-row">
+        <button class="btn danger" id="pk-fold">Fold</button>
+        <button class="btn" id="pk-check" ${canCheck ? "" : "disabled"}>${canCheck ? "Check" : "Check"}</button>
+        <button class="btn ok" id="pk-call" ${canCheck ? "disabled" : ""}>${canCheck ? "Call" : "Call " + Math.min(toCall, hero.stack).toLocaleString("pt-BR")}</button>
+        <button class="btn gold" id="pk-raise">Raise</button>
+        <button class="btn primary" id="pk-allin">All-in</button>
+      </div>
+      <div class="raise-row">
+        <button class="btn tiny ghost" id="pk-minus">−</button>
+        <input type="range" id="pk-slider" min="${Math.min(minTarget, maxTarget)}" max="${maxTarget}" step="${Math.max(1, Math.floor(s.bb / 2))}" value="${defaultTarget}">
+        <button class="btn tiny ghost" id="pk-plus">＋</button>
+        <div class="raise-val" id="pk-raiseval">${defaultTarget.toLocaleString("pt-BR")}</div>
+      </div>`;
+
+    const slider = $("#pk-slider");
+    const val = $("#pk-raiseval");
+    const syncVal = () => { val.textContent = Number(slider.value).toLocaleString("pt-BR"); };
+    slider.addEventListener("input", syncVal);
+    $("#pk-minus").addEventListener("click", () => { slider.value = Math.max(+slider.min, +slider.value - +slider.step * 2); syncVal(); });
+    $("#pk-plus").addEventListener("click", () => { slider.value = Math.min(+slider.max, +slider.value + +slider.step * 2); syncVal(); });
+    syncVal();
+
+    $("#pk-fold").addEventListener("click", () => { AudioManager.resume(); Poker.act(0, "fold"); this.renderPoker(); });
+    $("#pk-check").addEventListener("click", () => { AudioManager.resume(); Poker.act(0, "check"); this.renderPoker(); });
+    $("#pk-call").addEventListener("click", () => { AudioManager.resume(); Poker.act(0, "call"); this.renderPoker(); });
+    $("#pk-raise").addEventListener("click", () => { AudioManager.resume(); Poker.act(0, "raise", +slider.value); this.renderPoker(); });
+    $("#pk-allin").addEventListener("click", () => { AudioManager.resume(); Poker.act(0, "raise", hero.bet + hero.stack); this.renderPoker(); });
+  },
+
+  showRoundSummary(summary){
+    let body = `<table class="score-table"><thead><tr>
+      <th>Equipe</th><th>Jogos</th><th>Canastras</th><th>Batida</th><th>Mão</th><th>Rodada</th><th>Total</th>
+    </tr></thead><tbody>`;
+    for (const t of summary.teams){
+      body += `<tr>
+        <td>${this.esc(t.name)}</td>
+        <td>+${t.meldPts}</td>
+        <td>+${t.bonus}</td>
+        <td>+${t.batida}</td>
+        <td>−${t.handPts}</td>
+        <td>${t.total >= 0 ? "+" : ""}${t.total}</td>
+        <td class="total">${t.score}</td>
+      </tr>`;
+    }
+    body += `</tbody></table>`;
+    body += `<p style="text-align:center;color:#9fc4f0;font-size:12.5px;margin:12px 0 0;">${this.esc(summary.reason)}</p>`;
+
+    this.modal({
+      icon: "🃏",
+      title: `Fim da Rodada ${summary.round}`,
+      body,
+      actions: [
+        { label: "▶ Próxima Rodada", cls: "primary", fn: () => { Canastra.nextRound(); this.renderCanastra(); this.maybeRunCanastraAI(); } },
+        { label: "⏸ Pausar", cls: "ghost", fn: () => this.pauseMenu() }
+      ],
+      dismissible: false
+    });
+  },
+
+  showCanastraEnd(winner, humanWon){
+    const s = Canastra.state;
+    let body = `<p style="text-align:center;font-size:15px;margin:6px 0 14px;">
+      <b>${this.esc(winner.name)}</b> alcançou ${winner.score.toLocaleString("pt-BR")} pontos!</p>`;
+    body += `<table class="score-table"><tbody>`;
+    for (const t of s.teams)
+      body += `<tr><td>${this.esc(t.name)}</td><td class="total">${t.score.toLocaleString("pt-BR")}</td></tr>`;
+    body += `</tbody></table>`;
+    if (s.config.localMode){
+      body += `<p style="text-align:center;color:#9fc4f0;font-size:12px;margin-top:10px;">Parabéns ao vencedor! 🎉</p>`;
+    }
+
+    this.modal({
+      icon: humanWon ? "🏆" : "😔",
+      title: humanWon ? "VITÓRIA!" : "DERROTA",
+      body,
+      actions: [
+        { label: "🔄 Nova Partida", cls: "primary", fn: () => { Store.clearSave(); this.showScreen("canastra-setup"); } },
+        { label: "🏠 Menu Principal", cls: "ghost", fn: () => { Store.clearSave(); this.showScreen("menu"); } }
+      ],
+      dismissible: false
+    });
+  },
+
+  showPokerResult(results, humanWon, onNext){
+    let body = "";
+    if (results && results.length){
+      body += `<table class="score-table"><thead><tr><th>Pote</th><th>Vencedor</th><th>Mão</th></tr></thead><tbody>`;
+      for (const r of results)
+        body += `<tr><td>${r.amount.toLocaleString("pt-BR")}</td><td>${this.esc(r.winners.join(" e "))}</td><td>${this.esc(r.hand)}</td></tr>`;
+      body += `</tbody></table>`;
+    }
+    const s = Poker.state;
+    if (s && s.players[0].evalResult && !s.players[0].folded)
+      body += `<p style="text-align:center;color:#9fe8c8;font-size:12.5px;margin-top:10px;">Sua mão: <b>${s.players[0].evalResult.name}</b></p>`;
+
+    this.modal({
+      icon: humanWon ? "💰" : "🃏",
+      title: humanWon ? "Você venceu o pote!" : "Mão encerrada",
+      body,
+      actions: [
+        { label: "▶ Próxima Mão", cls: "primary", fn: () => { if (onNext) onNext(); } },
+        { label: "⏸ Pausar", cls: "ghost", fn: () => { if (onNext) onNext(); this.pauseMenu(); } }
+      ],
+      dismissible: false
+    });
+  },
+
+  showPokerEnd(stack, won){
+    this.modal({
+      icon: won ? "🏆" : "💀",
+      title: won ? "VOCÊ DOMINOU A MESA!" : "Fichas esgotadas",
+      body: `<p style="text-align:center;font-size:15px;">Suas fichas finais: <b>${stack.toLocaleString("pt-BR")}</b></p>`,
+      actions: [
+        { label: "🔄 Nova Mesa", cls: "primary", fn: () => { Store.clearSave(); this.showScreen("poker-setup"); } },
+        { label: "🏠 Menu Principal", cls: "ghost", fn: () => { Store.clearSave(); this.showScreen("menu"); } }
+      ],
+      dismissible: false
+    });
+  },
+
+  pauseMenu(){
+    const inCanastra = this.currentScreen === "canastra";
+    const inPoker = this.currentScreen === "poker";
+    const body = `<p style="text-align:center;color:#9fc4f0;font-size:12.5px;">Partida em andamento — o progresso é salvo automaticamente.</p>`;
+    this.modal({
+      icon: "⏸", title: "PAUSA", body,
+      actions: [
+        { label: "▶ Continuar", cls: "primary", fn: () => {
+            this.closeAllModals();
+            if (inCanastra) this.maybeRunCanastraAI();
+            if (inPoker) Poker.scheduleAI();
+        }},
+        { label: "💾 Salvar partida", cls: "ghost", fn: () => {
+            this.saveCurrentGame();
+            this.toast("💾 Partida salva com sucesso.", "gold");
+        }},
+        { label: "🔄 Reiniciar", cls: "ghost", fn: () => {
+            if (inCanastra && Canastra.state){
+              Canastra.state.teams.forEach(t => { t.score = 0; t.melds = []; });
+              Canastra.state.round = 1;
+              Canastra.startRound();
+              this.renderCanastra();
+              this.maybeRunCanastraAI();
+            }
+            if (inPoker && Poker.state){
+              Poker.newGame(Poker.state.config);
+              this.renderPoker();
+            }
+            this.toast("🔄 Partida reiniciada.");
+        }},
+        { label: "⚙ Configurações", cls: "ghost", fn: () => { this.showScreen("settings"); }},
+        { label: "🏠 Menu principal", cls: "danger", fn: () => {
+            this.saveCurrentGame();
+            this.showScreen("menu");
+        }}
+      ],
+      dismissible: true
+    });
+  },
+
+  saveCurrentGame(){
+    try{
+      if (this.currentScreen === "canastra" && Canastra.state) Store.setSave(Canastra.serialize());
+      else if (this.currentScreen === "poker" && Poker.state) Store.setSave(Poker.serialize());
+    }catch(e){}
+  },
+
+  renderStats(){
+    const p = Store.profile;
+    const st = Store.stats;
+    let html = `<div class="stat-grid">
+      <div class="stat-card"><div class="lbl">Partidas totais</div><div class="val">${p.games}</div></div>
+      <div class="stat-card"><div class="lbl">Vitórias</div><div class="val">${p.wins}</div></div>
+      <div class="stat-card"><div class="lbl">Derrotas</div><div class="val">${p.losses}</div></div>
+      <div class="stat-card"><div class="lbl">Aproveitamento</div><div class="val gold">${p.games ? Math.round(p.wins / p.games * 100) : 0}%</div></div>
+    </div>`;
+
+    html += `<h2 style="margin-top:18px;">🃏 Canastra</h2><div class="stat-grid">
+      <div class="stat-card"><div class="lbl">Partidas</div><div class="val">${st.canastra.games}</div></div>
+      <div class="stat-card"><div class="lbl">Vitórias</div><div class="val">${st.canastra.wins}</div></div>
+      <div class="stat-card"><div class="lbl">Derrotas</div><div class="val">${st.canastra.losses}</div></div>
+      <div class="stat-card"><div class="lbl">Maior pontuação</div><div class="val gold">${(st.canastra.best || 0).toLocaleString("pt-BR")}</div></div>
+      <div class="stat-card"><div class="lbl">Canastras</div><div class="val">${st.canastra.canastras || 0}</div></div>
+      <div class="stat-card"><div class="lbl">Canastras limpas</div><div class="val">${st.canastra.cleanCanastras || 0}</div></div>
+      <div class="stat-card"><div class="lbl">Batidas</div><div class="val">${st.canastra.batidas || 0}</div></div>
+    </div>`;
+
+    html += `<h2 style="margin-top:18px;">♠ Poker</h2><div class="stat-grid">
+      <div class="stat-card"><div class="lbl">Mãos jogadas</div><div class="val">${st.poker.hands}</div></div>
+      <div class="stat-card"><div class="lbl">Mãos vencidas</div><div class="val">${st.poker.wins}</div></div>
+      <div class="stat-card"><div class="lbl">All-ins</div><div class="val">${st.poker.allins}</div></div>
+      <div class="stat-card"><div class="lbl">Maior pote</div><div class="val gold">${(st.poker.bestPot || 0).toLocaleString("pt-BR")}</div></div>
+      <div class="stat-card"><div class="lbl">Showdowns</div><div class="val">${st.poker.showdowns || 0}</div></div>
+      <div class="stat-card"><div class="lbl">Royal Flush</div><div class="val">${st.poker.royalFlush || 0}</div></div>
+    </div>`;
+
+    $("#stats-content").innerHTML = html;
+
+    const lvl = p.level;
+    const xpInLevel = p.xp % 100;
+    $("#profile-content").innerHTML = `
+      <div class="stat-grid">
+        <div class="stat-card"><div class="lbl">Nome</div><div class="val" style="font-size:17px;">${this.esc(p.name)}</div></div>
+        <div class="stat-card"><div class="lbl">Nível</div><div class="val gold">${lvl}</div></div>
+        <div class="stat-card"><div class="lbl">XP</div><div class="val" style="font-size:17px;">${p.xp}</div></div>
+      </div>
+      <div style="margin-top:12px;">
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:#8ea3bd;margin-bottom:5px;">
+          <span>Progresso do nível</span><span>${xpInLevel}/100 XP</span>
+        </div>
+        <div style="height:9px;background:rgba(255,255,255,.08);border-radius:9px;overflow:hidden;">
+          <div style="height:100%;width:${xpInLevel}%;background:linear-gradient(90deg,#1e6fd9,#28c98a);border-radius:9px;transition:width .4s;"></div>
+        </div>
+      </div>`;
+  },
+
+  renderAchievements(){
+    let html = "";
+    for (const a of ACHIEVEMENTS){
+      const on = Achievements.has(a.id) ? " unlocked" : "";
+      html += `<div class="ach${on}">
+        <div class="ico">${a.icon}</div>
+        <div><div class="nm">${a.name}</div><div class="ds">${a.desc}</div></div>
+      </div>`;
+    }
+    $("#ach-content").innerHTML = html;
+  },
+
+  renderSettings(){
+    const s = Store.settings;
+    $("#set-anim").checked = s.animations;
+    $("#set-sound").checked = s.sounds;
+    $("#set-vibe").checked = s.vibration;
+    $("#set-reduce").checked = s.reduceMotion;
+    $("#set-log").checked = s.devLog;
+    document.body.classList.toggle("reduce-motion", s.reduceMotion || !s.animations);
+  },
+
+  esc(str){
+    return String(str == null ? "" : str)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+  }
+};
+
+/* ====== 11. LOOP IA CANASTRA ====== */
+let canastraAIBusy = false;
+async function canastraAILoop(){
+  if (canastraAIBusy) return;
+  const s = Canastra.state;
+  if (!s) return;
+  const cur = s.players[s.turn];
+  if (!cur || !cur.isAI) return;
+
+  canastraAIBusy = true;
+  try{
+    let guard = 0;
+    while (guard++ < 200){
+      const st = Canastra.state;
+      if (!st || st.phase === "roundEnd" || st.phase === "gameOver") break;
+      if (st.handoffPending) break;
+      const p = st.players[st.turn];
+      if (!p || !p.isAI) break;
+
+      await sleep(520);
+      const st2 = Canastra.state;
+      if (!st2 || st2.phase === "roundEnd" || st2.phase === "gameOver") break;
+      if (st2.handoffPending) break;
+      const p2 = st2.players[st2.turn];
+      if (!p2 || !p2.isAI) break;
+
+      CanastraAI.play(st2.turn);
+      UI.renderCanastra();
+      UI.saveCurrentGame();
+      await sleep(220);
+    }
+  }finally{
+    canastraAIBusy = false;
+    UI.renderCanastra();
+    UI.saveCurrentGame();
+  }
+}
+
+UI.maybeRunCanastraAI = function(){
+  const s = Canastra.state;
+  if (!s) return;
+  if (s.phase === "roundEnd" || s.phase === "gameOver") return;
+  if (s.handoffPending) return;
+  const p = s.players[s.turn];
+  if (p && p.isAI) canastraAILoop();
+};
+
+/* ============================================================================
+   DRAG-AND-DROP — reordenação da mão
+   ============================================================================ */
+const DragManager = {
+  state: null,
+  suppressClickUntil: 0,
+  MOVE_TOLERANCE: 10,
+  HOLD_MS: 280,
+  MOUSE_DRAG_THRESHOLD: 6,
+
+  start(e){
+    const card = e.target.closest("#canastra-hand .card.selectable");
+    if (!card) return;
+    const s = Canastra.state;
+    if (!s || s.phase !== "act" || s.handoffPending) return;
+    const viewer = s.players[s.viewerIdx];
+    if (!viewer || viewer.isAI || s.turn !== s.viewerIdx) return;
+    if (e.pointerType === "mouse" && e.button !== 0) return;
+
+    const id = card.getAttribute("data-card");
+    const hand = viewer.hand;
+    const originIdx = hand.findIndex(c => c.id === id);
+    if (originIdx < 0) return;
+
+    const rect = card.getBoundingClientRect();
+    this.state = {
+      pointerId: e.pointerId,
+      cardId: id,
+      originIdx,
+      startX: e.clientX,
+      startY: e.clientY,
+      rect,
+      cardEl: card,
+      active: false,
+      targetIdx: originIdx,
+      ghost: null,
+      holdTimer: null,
+      pointerType: e.pointerType
+    };
+
+    if (e.pointerType !== "mouse"){
+      this.state.holdTimer = setTimeout(() => this.activate(), this.HOLD_MS);
+    }
+  },
+
+  move(e){
+    const st = this.state;
+    if (!st) return;
+    const dx = e.clientX - st.startX;
+    const dy = e.clientY - st.startY;
+    const dist = Math.hypot(dx, dy);
+
+    if (!st.active){
+      if (st.pointerType === "mouse" && dist > this.MOUSE_DRAG_THRESHOLD){
+        this.activate();
+      } else if (dist > this.MOVE_TOLERANCE){
+        clearTimeout(st.holdTimer);
+        this.state = null;
+        return;
+      } else {
+        return;
+      }
+    }
+
+    if (e.cancelable) e.preventDefault();
+
+    const s = Canastra.state;
+    if (!s) return;
+
+    const gx = st.rect.left + dx;
+    const gy = st.rect.top + dy;
+    if (st.ghost){
+      st.ghost.style.left = gx + "px";
+      st.ghost.style.top = gy + "px";
+    }
+
+    const handEl = document.getElementById("canastra-hand");
+    if (!handEl) return;
+    const cards = Array.from(handEl.querySelectorAll(".card.selectable"));
+    let target = cards.length;
+    for (let i = 0; i < cards.length; i++){
+      const r = cards[i].getBoundingClientRect();
+      const cx = r.left + r.width / 2;
+      if (e.clientX < cx){ target = i; break; }
+    }
+
+    if (target !== st.targetIdx){
+      st.targetIdx = target;
+      cards.forEach((c, i) => {
+        c.classList.toggle("drop-target", i === target && i !== st.originIdx);
+      });
+    }
+  },
+
+  end(e){
+    const st = this.state;
+    if (!st) return;
+    if (st.holdTimer) clearTimeout(st.holdTimer);
+
+    if (st.active){
+      this.suppressClickUntil = Date.now() + 400;
+
+      const s = Canastra.state;
+      if (s){
+        const hand = s.players[s.viewerIdx].hand;
+        const from = st.originIdx;
+        let to = st.targetIdx;
+        if (to > from) to--;
+        if (from !== to && from >= 0 && to >= 0 && to < hand.length + 1){
+          const [card] = hand.splice(from, 1);
+          hand.splice(Math.min(to, hand.length), 0, card);
+          AudioManager.drop();
+          vibrate(10);
+          UI.toast("↔ Carta reordenada.", null, 1100);
+        }
+      }
+
+      if (st.ghost && st.ghost.parentNode) st.ghost.parentNode.removeChild(st.ghost);
+      document.querySelectorAll(".card.dragging, .card.drop-target").forEach(c => {
+        c.classList.remove("dragging", "drop-target");
+      });
+
+      UI.renderCanastra();
+    }
+
+    this.state = null;
+  },
+
+  cancel(){
+    const st = this.state;
+    if (!st) return;
+    if (st.holdTimer) clearTimeout(st.holdTimer);
+    if (st.ghost && st.ghost.parentNode) st.ghost.parentNode.removeChild(st.ghost);
+    document.querySelectorAll(".card.dragging, .card.drop-target").forEach(c => {
+      c.classList.remove("dragging", "drop-target");
+    });
+    this.state = null;
+  },
+
+  activate(){
+    const st = this.state;
+    if (!st || st.active) return;
+    st.active = true;
+    st.targetIdx = st.originIdx;
+
+    st.cardEl.classList.add("dragging");
+
+    const ghost = st.cardEl.cloneNode(true);
+    ghost.classList.add("drag-ghost");
+    ghost.classList.remove("sel", "dragging");
+    ghost.style.position = "fixed";
+    ghost.style.left = st.rect.left + "px";
+    ghost.style.top = st.rect.top + "px";
+    ghost.style.width = st.rect.width + "px";
+    ghost.style.height = st.rect.height + "px";
+    ghost.style.zIndex = "9999";
+    ghost.style.transform = "scale(1.06)";
+    document.body.appendChild(ghost);
+    st.ghost = ghost;
+
+    AudioManager.pickup();
+    vibrate(12);
+  }
+};
+
+/* ====== 12. EVENTOS ====== */
+function bindEvents(){
+
+  document.addEventListener("click", (e) => {
+    const nav = e.target.closest("[data-nav]");
+    if (nav){
+      AudioManager.resume();
+      UI.closeAllModals();
+      UI.showScreen(nav.getAttribute("data-nav"));
+      return;
+    }
+  });
+
+  $("#btn-back").addEventListener("click", () => {
+    AudioManager.resume();
+    if (UI.currentScreen === "canastra" || UI.currentScreen === "poker") UI.pauseMenu();
+    else UI.showScreen("menu");
+  });
+
+  $("#btn-pause").addEventListener("click", () => {
+    AudioManager.resume();
+    UI.pauseMenu();
+  });
+
+  $("#btn-resume").addEventListener("click", () => {
+    AudioManager.resume();
+    const save = Store.data.save;
+    if (!save) return;
+    if (save.kind === "canastra"){
+      Canastra.onChange = () => { UI.renderCanastra(); };
+      Canastra.deserialize(save);
+      UI._lastRenderedViewer = null;
+      UI.showScreen("canastra");
+      UI.renderCanastra();
+      UI.maybeRunCanastraAI();
+    } else {
+      Poker.onChange = () => { UI.renderPoker(); };
+      Poker.deserialize(save);
+      UI.showScreen("poker");
+      UI.renderPoker();
+    }
+    UI.toast("▶ Partida recuperada.");
+  });
+
+  function bindSeg(id, onChange){
+    const seg = $("#" + id);
+    if (!seg) return;
+    seg.addEventListener("click", (e) => {
+      const b = e.target.closest("button[data-v]");
+      if (!b) return;
+      $$("button", seg).forEach(x => x.classList.remove("on"));
+      b.classList.add("on");
+      if (onChange) onChange(b.getAttribute("data-v"));
+    });
+  }
+
+  bindSeg("seg-canastra-mode");
+  bindSeg("seg-canastra-opp", (v) => {
+    const field = $("#field-p2name");
+    if (field) field.style.display = (v === "local") ? "block" : "none";
+  });
+  bindSeg("seg-canastra-diff");
+  bindSeg("seg-canastra-target", (v) => {
+    const inp = $("#canastra-target-custom");
+    inp.style.display = (v === "custom") ? "block" : "none";
+  });
+  bindSeg("seg-poker-diff");
+  bindSeg("seg-poker-stack");
+  bindSeg("seg-poker-blinds");
+
+  const segVal = (id, fb) => {
+    const b = $("#" + id + " button.on");
+    return b ? b.getAttribute("data-v") : fb;
+  };
+
+  $("#btn-start-canastra").addEventListener("click", () => {
+    AudioManager.resume();
+    const numPlayers = parseInt(segVal("seg-canastra-mode", "2"), 10);
+    const oppMode = segVal("seg-canastra-opp", "ai");
+    const localMode = (oppMode === "local");
+    const difficulty = segVal("seg-canastra-diff", "medium");
+    let target = segVal("seg-canastra-target", "3000");
+    if (target === "custom") target = parseInt($("#canastra-target-custom").value, 10) || 3000;
+    else target = parseInt(target, 10);
+    const playerName = $("#canastra-pname").value.trim() || "Jogador 1";
+    const player2Name = $("#canastra-p2name").value.trim() || "Jogador 2";
+    const teamName = $("#canastra-tname").value.trim() || "Equipe A";
+    const reveal = $("#canastra-reveal").checked;
+
+    Store.profile.name = playerName;
+    Store.save();
+
+    Canastra.onChange = () => { UI.renderCanastra(); };
+    Canastra.newGame({
+      numPlayers, difficulty, targetScore: target,
+      playerName, player2Name, teamName, reveal,
+      localMode
+    });
+
+    UI.selectedCards.clear();
+    UI.selectedMeld = null;
+    UI._lastRenderedViewer = null;
+    UI._handoffModalOpen = false;
+    UI.showScreen("canastra");
+    UI.renderCanastra();
+    UI.maybeRunCanastraAI();
+  });
+
+  $("#btn-start-poker").addEventListener("click", () => {
+    AudioManager.resume();
+    const difficulty = segVal("seg-poker-diff", "medium");
+    const stack = parseInt(segVal("seg-poker-stack", "10000"), 10);
+    const bb = parseInt(segVal("seg-poker-blinds", "50"), 10);
+    const playerName = $("#poker-pname").value.trim() || "Você";
+
+    Store.profile.name = playerName;
+    Store.save();
+
+    Poker.onChange = () => { UI.renderPoker(); };
+    Poker.newGame({ difficulty, stack, smallBlind: Math.floor(bb / 2), bigBlind: bb, playerName });
+
+    UI.showScreen("poker");
+    UI.renderPoker();
+  });
+
+  /* --- Cliques na mesa de Canastra --- */
+  $("#canastra-wrap").addEventListener("click", (e) => {
+    if (Date.now() < DragManager.suppressClickUntil) return;
+    AudioManager.resume();
+    const s = Canastra.state;
+    if (!s) return;
+    if (s.handoffPending) return;   /* bloqueia ações durante o passe */
+
+    const viewer = s.players[s.viewerIdx];
+    const isHuman = viewer && !viewer.isAI;
+    const isTurn = s.turn === s.viewerIdx;
+
+    const cardNode = e.target.closest("#canastra-hand .card[data-card]");
+    if (cardNode){
+      if (!isHuman || !isTurn) return;
+      const id = cardNode.getAttribute("data-card");
+      if (UI.selectedCards.has(id)) UI.selectedCards.delete(id);
+      else UI.selectedCards.add(id);
+      UI.renderCanastra();
+      return;
+    }
+
+    const meldNode = e.target.closest(".meld[data-meld]");
+    if (meldNode){
+      if (!isHuman) return;
+      const mid = meldNode.getAttribute("data-meld");
+      UI.selectedMeld = (UI.selectedMeld === mid) ? null : mid;
+      UI.renderCanastra();
+      return;
+    }
+
+    const actionNode = e.target.closest("[data-action]");
+    if (!actionNode) return;
+    const action = actionNode.getAttribute("data-action");
+
+    if (action === "draw"){
+      if (!(isTurn && isHuman && s.phase === "draw")){ UI.toast("⚠ Ação inválida agora.", "warn"); return; }
+      Canastra.snapshot();
+      const r = Canastra.drawStock(s.viewerIdx);
+      if (!r.ok){ UI.toast("⚠ " + r.msg, "warn"); AudioManager.error(); }
+      UI.renderCanastra();
+      UI.saveCurrentGame();
+      return;
+    }
+
+    if (action === "take"){
+      if (!(isTurn && isHuman)){ UI.toast("⚠ Ação inválida agora.", "warn"); return; }
+      const reason = Canastra.whyCantTakeDiscard(s.viewerIdx);
+      if (reason){
+        UI.toast("⚠ " + reason, "warn", 3600);
+        AudioManager.error();
+        return;
+      }
+      Canastra.snapshot();
+      const r = Canastra.takeDiscard(s.viewerIdx);
+      if (!r.ok){ UI.toast("⚠ " + r.msg, "warn"); }
+      UI.renderCanastra();
+      UI.saveCurrentGame();
+      return;
+    }
+
+    if (action === "meld"){
+      if (!UI.canMeldNow()){
+        UI.toast("⚠ Selecione 3+ cartas do mesmo valor ou do mesmo naipe em sequência.", "warn", 3400);
+        AudioManager.error(); return;
+      }
+      Canastra.snapshot();
+      const ids = Array.from(UI.selectedCards);
+      const r = Canastra.meld(s.viewerIdx, ids);
+      if (!r.ok){ UI.toast("⚠ " + r.msg, "warn"); AudioManager.error(); Canastra.undo(); }
+      else UI.selectedCards.clear();
+      UI.renderCanastra();
+      UI.saveCurrentGame();
+      return;
+    }
+
+    if (action === "add"){
+      if (!UI.canAddNow()){
+        UI.toast("⚠ Selecione um jogo na mesa e cartas compatíveis na sua mão.", "warn", 3400);
+        AudioManager.error(); return;
+      }
+      Canastra.snapshot();
+      const ids = Array.from(UI.selectedCards);
+      const r = Canastra.addToMeld(s.viewerIdx, UI.selectedMeld, ids);
+      if (!r.ok){ UI.toast("⚠ " + r.msg, "warn"); AudioManager.error(); Canastra.undo(); }
+      else UI.selectedCards.clear();
+      UI.renderCanastra();
+      UI.saveCurrentGame();
+      return;
+    }
+
+    if (action === "discard"){
+      if (!UI.canDiscardNow()){ UI.toast("⚠ Selecione exatamente 1 carta para descartar.", "warn"); AudioManager.error(); return; }
+      Canastra.snapshot();
+      const id = Array.from(UI.selectedCards)[0];
+      const r = Canastra.discard(s.viewerIdx, id);
+      if (!r.ok){ UI.toast("⚠ " + r.msg, "warn"); AudioManager.error(); Canastra.undo(); }
+      else UI.selectedCards.clear();
+      UI.renderCanastra();
+      UI.saveCurrentGame();
+      UI.maybeRunCanastraAI();
+      return;
+    }
+
+    if (action === "undo"){
+      if (Canastra.undo()){ UI.selectedCards.clear(); UI.toast("↶ Jogada desfeita."); }
+      else UI.toast("⚠ Nada para desfazer.", "warn");
+      UI.renderCanastra();
+      return;
+    }
+
+    if (action === "sort"){
+      if (!isHuman || !isTurn) return;
+      const hand = viewer.hand;
+      hand.sort((a, b) => {
+        if (a.joker !== b.joker) return a.joker ? 1 : -1;
+        const ar = C_RANKS.indexOf(a.rank), br = C_RANKS.indexOf(b.rank);
+        if (ar !== br) return ar - br;
+        return C_SUITS.indexOf(a.suit) - C_SUITS.indexOf(b.suit);
+      });
+      UI.renderCanastra();
+      return;
+    }
+  });
+
+  /* --- Pointer Events para drag-and-drop --- */
+  document.addEventListener("pointerdown", (e) => DragManager.start(e), true);
+  document.addEventListener("pointermove", (e) => DragManager.move(e), { capture: true, passive: false });
+  document.addEventListener("pointerup", (e) => DragManager.end(e), true);
+  document.addEventListener("pointercancel", () => DragManager.cancel(), true);
+
+  document.addEventListener("touchmove", (e) => {
+    if (DragManager.state && DragManager.state.active && e.cancelable){
+      e.preventDefault();
+    }
+  }, { passive: false });
+
+  /* --- Configurações --- */
+  $("#set-anim").addEventListener("change", (e) => {
+    Store.settings.animations = e.target.checked; Store.save();
+    document.body.classList.toggle("reduce-motion", !e.target.checked || Store.settings.reduceMotion);
+  });
+  $("#set-sound").addEventListener("change", (e) => {
+    Store.settings.sounds = e.target.checked; Store.save();
+    if (e.target.checked){ AudioManager.resume(); AudioManager.chip(); }
+  });
+  $("#set-vibe").addEventListener("change", (e) => { Store.settings.vibration = e.target.checked; Store.save(); });
+  $("#set-reduce").addEventListener("change", (e) => {
+    Store.settings.reduceMotion = e.target.checked; Store.save();
+    document.body.classList.toggle("reduce-motion", e.target.checked);
+  });
+  $("#set-log").addEventListener("change", (e) => { Store.settings.devLog = e.target.checked; Store.save(); });
+
+  $("#btn-wipe").addEventListener("click", () => {
+    UI.modal({
+      icon: "⚠", title: "Apagar todos os dados?",
+      body: `<p style="text-align:center;color:#9fc4f0;font-size:13px;">Estatísticas, conquistas, perfil e partidas salvas serão removidos permanentemente.</p>`,
+      actions: [
+        { label: "Cancelar", cls: "ghost", fn: () => {} },
+        { label: "Apagar tudo", cls: "danger", fn: () => {
+            try{ localStorage.removeItem(Store.KEY); }catch(e){}
+            Store.load();
+            UI.renderSettings(); UI.renderStats(); UI.renderAchievements(); UI.renderMenu();
+            UI.toast("🗑 Todos os dados foram apagados.", "err");
+        }}
+      ],
+      dismissible: true
+    });
+  });
+
+  window.addEventListener("beforeinstallprompt", (e) => {
+    e.preventDefault();
+    UI.deferredPrompt = e;
+    $("#btn-install").hidden = false;
+  });
+
+  $("#btn-install").addEventListener("click", async () => {
+    const ev = UI.deferredPrompt;
+    if (!ev) return;
+    ev.prompt();
+    try{
+      const choice = await ev.userChoice;
+      if (choice && choice.outcome === "accepted") UI.toast("📲 Instalando APAVAN CARD GAMES…", "gold");
+    }catch(e){}
+    UI.deferredPrompt = null;
+    $("#btn-install").hidden = true;
+  });
+
+  const unlock = () => { AudioManager.resume(); document.removeEventListener("pointerdown", unlock); };
+  document.addEventListener("pointerdown", unlock);
+
+  document.addEventListener("keydown", (e) => {
+    if (UI.currentScreen === "canastra"){
+      const s = Canastra.state;
+      if (!s || s.handoffPending) return;
+      const viewer = s.players[s.viewerIdx];
+      if (!viewer || viewer.isAI || s.turn !== s.viewerIdx) return;
+      if (e.key === "d" && s.phase === "draw"){ Canastra.drawStock(s.viewerIdx); UI.renderCanastra(); }
+      else if (e.key === "z" && (e.ctrlKey || e.metaKey)){ Canastra.undo(); UI.renderCanastra(); }
+      else if (e.key === "Escape"){ UI.pauseMenu(); }
+    }
+    if (UI.currentScreen === "poker"){
+      if (e.key === "f"){ Poker.act(0, "fold"); UI.renderPoker(); }
+      else if (e.key === "c"){
+        const h = Poker.state.players[0];
+        if (Poker.state.currentBet - h.bet <= 0) Poker.act(0, "check"); else Poker.act(0, "call");
+        UI.renderPoker();
+      }
+      else if (e.key === "Escape"){ UI.pauseMenu(); }
+    }
+  });
+
+  window.addEventListener("beforeunload", () => { UI.saveCurrentGame(); });
+  document.addEventListener("visibilitychange", () => { if (document.hidden) UI.saveCurrentGame(); });
+}
+
+/* ====== 13. PWA ====== */
+function initPWA(){
+  try{
+    const iconSVG = "data:image/svg+xml," + encodeURIComponent(
+      `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+        <defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#123059"/><stop offset="1" stop-color="#04080f"/>
+        </linearGradient></defs>
+        <rect width="512" height="512" rx="96" fill="url(#g)"/>
+        <rect x="140" y="96" width="212" height="300" rx="28" fill="#f2f6fb" transform="rotate(-12 246 246)"/>
+        <text x="256" y="330" font-size="200" text-anchor="middle" fill="#1e6fd9" font-family="sans-serif">♠</text>
+        <rect x="180" y="120" width="212" height="300" rx="28" fill="#e6eefb" transform="rotate(8 286 270)" opacity="0.85"/>
+        <text x="300" y="350" font-size="180" text-anchor="middle" fill="#c62d24" font-family="sans-serif">♥</text>
+      </svg>`);
+
+    const manifest = {
+      name: "APAVAN CARD GAMES — Canastra + Poker",
+      short_name: "APAVAN Cards",
+      description: "Canastra e Texas Hold'em offline com IA e multiplayer local.",
+      start_url: ".", scope: ".", display: "standalone", orientation: "any",
+      background_color: "#04080f", theme_color: "#0a1628", lang: "pt-BR",
+      categories: ["games", "entertainment"],
+      icons: [
+        { src: iconSVG, sizes: "192x192", type: "image/svg+xml", purpose: "any" },
+        { src: iconSVG, sizes: "512x512", type: "image/svg+xml", purpose: "any" },
+        { src: iconSVG, sizes: "512x512", type: "image/svg+xml", purpose: "maskable" }
+      ]
+    };
+    const blob = new Blob([JSON.stringify(manifest)], { type: "application/manifest+json" });
+    const url = URL.createObjectURL(blob);
+    const link = $("#manifest-link");
+    if (link) link.href = url;
+  }catch(e){}
+
+  if ("serviceWorker" in navigator && location.protocol.startsWith("http")){
+    try{
+      const swCode = `
+        const CACHE = 'apavan-card-games-v13';
+        self.addEventListener('install', e => { self.skipWaiting(); });
+        self.addEventListener('activate', e => { e.waitUntil(self.clients.claim()); });
+        self.addEventListener('fetch', e => {
+          if (e.request.method !== 'GET') return;
+          e.respondWith(
+            caches.match(e.request).then(cached => {
+              if (cached) return cached;
+              return fetch(e.request).then(res => {
+                try { const copy = res.clone(); caches.open(CACHE).then(c => c.put(e.request, copy)); } catch (err) {}
+                return res;
+              }).catch(() => cached);
+            })
+          );
+        });
+      `;
+      const swBlob = new Blob([swCode], { type: "text/javascript" });
+      const swUrl = URL.createObjectURL(swBlob);
+      navigator.serviceWorker.register(swUrl).catch(() => {});
+    }catch(e){}
+  }
+}
+
+/* ====== 14. AUTOTESTES ====== */
+function runSelfTests(){
+  const results = [];
+  const assert = (name, cond) => { results.push({ name, ok: !!cond }); };
+  const C = (r, s) => ({ id: r + s + Math.random(), rank: r, suit: s, joker: false });
+
+  assert("Royal Flush",
+    evaluateHand([C("A","♠"),C("K","♠"),C("Q","♠"),C("J","♠"),C("10","♠"),C("2","♥"),C("3","♦")]).cat === 9);
+  assert("Straight Flush",
+    evaluateHand([C("9","♥"),C("8","♥"),C("7","♥"),C("6","♥"),C("5","♥"),C("2","♠"),C("3","♦")]).cat === 8);
+  assert("Quadra",
+    evaluateHand([C("K","♠"),C("K","♥"),C("K","♦"),C("K","♣"),C("5","♥"),C("2","♠"),C("3","♦")]).cat === 7);
+  assert("Full House",
+    evaluateHand([C("Q","♠"),C("Q","♥"),C("Q","♦"),C("7","♣"),C("7","♥"),C("2","♠"),C("3","♦")]).cat === 6);
+  assert("Flush",
+    evaluateHand([C("A","♦"),C("J","♦"),C("9","♦"),C("6","♦"),C("3","♦"),C("2","♠"),C("K","♥")]).cat === 5);
+  assert("Sequência",
+    evaluateHand([C("A","♠"),C("K","♥"),C("Q","♦"),C("J","♣"),C("10","♥"),C("2","♠"),C("3","♦")]).cat === 4);
+  assert("Sequência (roda A-5)",
+    evaluateHand([C("A","♠"),C("2","♥"),C("3","♦"),C("4","♣"),C("5","♥"),C("K","♠"),C("Q","♦")]).cat === 4);
+  assert("Trinca",
+    evaluateHand([C("8","♠"),C("8","♥"),C("8","♦"),C("K","♣"),C("3","♥"),C("2","♠"),C("5","♦")]).cat === 3);
+  assert("Dois Pares",
+    evaluateHand([C("J","♠"),C("J","♥"),C("4","♦"),C("4","♣"),C("A","♥"),C("2","♠"),C("7","♦")]).cat === 2);
+  assert("Par",
+    evaluateHand([C("10","♠"),C("10","♥"),C("7","♦"),C("4","♣"),C("2","♥"),C("9","♠"),C("3","♦")]).cat === 1);
+  assert("Carta Alta",
+    evaluateHand([C("A","♠"),C("J","♥"),C("8","♦"),C("5","♣"),C("3","♥"),C("9","♠"),C("2","♦")]).cat === 0);
+
+  const h1 = evaluateHand([C("A","♠"),C("A","♥"),C("K","♦"),C("K","♣"),C("5","♥"),C("2","♠"),C("3","♦")]);
+  const h2 = evaluateHand([C("A","♦"),C("A","♣"),C("Q","♦"),C("Q","♣"),C("5","♠"),C("2","♥"),C("3","♠")]);
+  assert("Desempate dois pares", compareEval(h1, h2) > 0);
+
+  const deck = Canastra.buildDeck();
+  assert("Canastra: 108 cartas", deck.length === 108);
+  assert("Canastra: ids únicos", new Set(deck.map(c => c.id)).size === 108);
+
+  const g1 = Canastra.validateGroup([C("K","♠"),C("K","♥"),C("K","♦")]);
+  assert("Set válido", g1.ok === true && g1.type === "set");
+  const seq1 = Canastra.validateGroup([C("2","♠"),C("3","♠"),C("4","♠"),C("5","♠")]);
+  assert("Sequência 2-3-4-5 ♠", seq1.ok === true && seq1.type === "sequence");
+  const seq2 = Canastra.validateGroup([C("J","♥"),C("Q","♥"),C("K","♥")]);
+  assert("Sequência J-Q-K ♥", seq2.ok === true);
+  const seq3 = Canastra.validateGroup([C("A","♠"),C("2","♠"),C("3","♠")]);
+  assert("Sequência A-2-3 ♠", seq3.ok === true);
+  const seq4 = Canastra.validateGroup([C("2","♠"),C("3","♥"),C("4","♠")]);
+  assert("Rejeita sequência com naipes mistos", seq4.ok === false);
+
+  assert("LocalStorage OK", (() => { try{ localStorage.setItem("__t","1"); localStorage.removeItem("__t"); return true; }catch(e){ return false; } })());
+
+  const failed = results.filter(r => !r.ok);
+  if (failed.length) console.warn("⚠ APAVAN — testes com falha:", failed);
+  else console.log("%c✔ APAVAN — " + results.length + " testes automáticos aprovados.", "color:#28c98a;font-weight:bold;");
+  return results;
+}
+
+/* ====== 15. BOOT ====== */
+(function boot(){
+  bindEvents();
+  UI.renderMenu();
+  UI.renderSettings();
+  document.body.classList.toggle("reduce-motion", Store.settings.reduceMotion || !Store.settings.animations);
+  initPWA();
+  try{ runSelfTests(); }catch(e){ console.warn("Falha nos autotestes:", e); }
+
+  setInterval(() => {
+    if (UI.currentScreen === "canastra" || UI.currentScreen === "poker") UI.saveCurrentGame();
+  }, 8000);
+
+  console.log("%c🃏 APAVAN CARD GAMES V1.3", "color:#4d9fff;font-size:15px;font-weight:bold;");
+  console.log("Canastra + Texas Hold'em — multiplayer local + IA. Boa jogatina!");
+})();
+</script>
+</body>
+</html>
